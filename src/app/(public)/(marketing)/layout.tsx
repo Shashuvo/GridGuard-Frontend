@@ -1,9 +1,13 @@
+import { Header } from "@/components/layout/public/Header";
 import type { ReactNode } from "react";
 
 export default function layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-1">{children}</main>
+      <Header />
+      <main className="flex-1">
+        {children}
+      </main>
     </div>
   );
 }
