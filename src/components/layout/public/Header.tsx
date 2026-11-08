@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Activity, CalendarClock, House, Info, Menu, User, X, Zap } from "lucide-react"
+import { Activity, CalendarClock, House, Info, Menu, User, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { LogoMark } from "./LogoMark"
 
 const navItems = [
     { label: "Home", href: "/", icon: House },
@@ -23,10 +24,8 @@ export function Header() {
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
             <nav className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2.5 text-lg font-semibold">
-                    <span className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-200 hover:scale-105">
-                        <Zap className="size-4.5 fill-current" strokeWidth={2.5} />
-                    </span>
+                <Link href="/" aria-label="GridGuard home" className="group flex items-center gap-1 text-lg font-semibold">
+                    <LogoMark className="size-10 drop-shadow-sm transition-transform duration-200 group-hover:scale-105" />
                     <span className="font-serif text-xl tracking-tight">
                         Grid
                         <span className="text-primary-foreground dark:text-primary">Guard</span>
