@@ -14,7 +14,7 @@ export default function LoginPage() {
         {/* soft glow */}
         <div
           aria-hidden
-          className="absolute -top-40 -left-40 -z-10 size-[28rem] rounded-full bg-muted-foreground/15 blur-3xl"
+          className="absolute -top-40 -left-40 -z-10 size-112 rounded-full bg-muted-foreground/15 blur-3xl"
         />
         {/* faint dot grid, fading out toward the edges */}
         <div
