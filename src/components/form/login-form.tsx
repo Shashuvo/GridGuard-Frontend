@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { loginSchema } from "@/validation"
+import { useLogin } from "@/hooks"
 
 const inputClass =
   "h-11 rounded-full border-input bg-background pl-11 text-[15px] shadow-xs transition-shadow focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20"
@@ -36,6 +37,7 @@ export default function LoginForm({
   const [showPassword, setShowPassword] = useState(false)
   const [capsLock, setCapsLock] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const {mutate: login, isPending : loginPending} = useLogin();
 
   const form = useForm({
     defaultValues: {
@@ -46,16 +48,17 @@ export default function LoginForm({
     validators: {
       onSubmit: loginSchema,
     },
-    onSubmit: async ({ value }) => {
-      setSubmitError(null)
-      try {
-        // TODO: await your login action here, e.g. await login(value)
-        console.log(value)
-      } catch {
-        // Show whatever message your API returns
-        setSubmitError("Incorrect email or password. Please try again.")
-      }
-    },
+    onSubmit: ({value})=>{
+      const loginData = {
+        email: value.email,
+        password: value.password
+      };
+      login(loginData, {
+        onSuccess: (res) =>{
+          console.log(res);
+        }
+      })
+    }
   })
 
   return (

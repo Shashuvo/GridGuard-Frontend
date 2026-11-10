@@ -35,7 +35,7 @@ export default function LoginPage() {
           <Link
             href="/"
             aria-label="GridGuard home"
-            className="group flex items-center gap-2.5 text-lg font-semibold"
+            className="group flex items-center gap-1 text-lg font-semibold"
           >
             <LogoMark className="size-10 drop-shadow-sm transition-transform duration-200 group-hover:scale-105" />
             <span className="font-serif text-xl tracking-tight">
