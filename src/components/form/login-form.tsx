@@ -26,6 +26,10 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { loginSchema } from "@/validation"
 import { useLogin } from "@/hooks"
+import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+
 
 const inputClass =
   "h-11 rounded-full border-input bg-background pl-11 text-[15px] shadow-xs transition-shadow focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20"
@@ -37,29 +41,52 @@ export default function LoginForm({
   const [showPassword, setShowPassword] = useState(false)
   const [capsLock, setCapsLock] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const {mutate: login, isPending : loginPending} = useLogin();
-
+  const {
+    mutateAsync: login,
+    isPending: loginPending,
+  } = useLogin();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
-      remember: false,
+      email: "admin@gridguard.com",
+      password: "GridGuard@TestAdmin2026!",
     },
     validators: {
       onSubmit: loginSchema,
     },
-    onSubmit: ({value})=>{
+    onSubmit: ({ value }) => {
       const loginData = {
         email: value.email,
-        password: value.password
+        password: value.password,
       };
+
       login(loginData, {
-        onSuccess: (res) =>{
-          console.log(res);
-        }
-      })
-    }
-  })
+        onSuccess: (res) => {
+          const { accessToken, refreshToken } = res.data;
+
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+
+          toast.success("Login Successfully.",{
+            description: " Welcome back to GridGuard.",
+            position: "top-right",
+          },);
+
+          queryClient.invalidateQueries({ queryKey: ["user"] });
+
+          router.push("/");
+        },
+        onError: (err) => {
+          toast.success("Login Error.",{
+            description: err.message || "Failed to login, Please try again later.",
+            position: "top-right",
+          },);
+        },
+      });
+    },
+  });
 
   return (
     <form
@@ -199,37 +226,13 @@ export default function LoginForm({
           }}
         </form.Field>
 
-        {/* Remember me */}
-        <form.Field name="remember">
-          {(field) => (
-            <div className="flex items-center gap-2.5">
-              <Checkbox
-                id={field.name}
-                checked={field.state.value}
-                onCheckedChange={(checked) =>
-                  field.handleChange(checked === true)
-                }
-              />
-              <FieldLabel
-                htmlFor={field.name}
-                className="cursor-pointer font-normal text-muted-foreground"
-              >
-                Keep me logged in on this device
-              </FieldLabel>
-            </div>
-          )}
-        </form.Field>
-
         {/* Submit */}
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <Field>
-              <Button
+        <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={loginPending}
                 className="h-12 rounded-full text-base font-semibold shadow-md shadow-primary/30 transition-all hover:shadow-lg hover:shadow-primary/40 active:scale-[0.99] motion-reduce:transition-none"
               >
-                {isSubmitting ? (
+                {loginPending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" aria-hidden />
                     Logging in
@@ -237,10 +240,7 @@ export default function LoginForm({
                 ) : (
                   "Login"
                 )}
-              </Button>
-            </Field>
-          )}
-        </form.Subscribe>
+        </Button>
 
         <FieldDescription className="text-center">
           New to GridGuard?{" "}
