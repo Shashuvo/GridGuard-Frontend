@@ -40,7 +40,6 @@ export default function LoginForm({
 }: React.ComponentProps<"form">) {
   const [showPassword, setShowPassword] = useState(false)
   const [capsLock, setCapsLock] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
   const {
     mutateAsync: login,
     isPending: loginPending,
@@ -108,17 +107,6 @@ export default function LoginForm({
             Log in to check schedules, report outages and follow repairs.
           </p>
         </div>
-
-        {/* Sign-in error from the server */}
-        {submitError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          >
-            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
-            {submitError}
-          </div>
-        )}
 
         {/* Email */}
         <form.Field
