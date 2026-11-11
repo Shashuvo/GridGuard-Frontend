@@ -4,7 +4,6 @@ import { useState } from "react"
 import Link from "next/link"
 import { useForm } from "@tanstack/react-form"
 import {
-  CircleAlert,
   Eye,
   EyeOff,
   Loader2,
@@ -14,7 +13,6 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldDescription,
