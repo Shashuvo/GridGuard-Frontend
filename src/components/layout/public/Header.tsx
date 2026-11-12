@@ -3,11 +3,14 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Activity, CalendarClock, House, Info, Menu, User, X } from "lucide-react"
+import { Activity, CalendarClock, House, Info, LogOut, Menu, User, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { LogoMark } from "./LogoMark"
+import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { useGetMe } from "@/hooks"
 
 const navItems = [
     { label: "Home", href: "/", icon: House },
@@ -18,7 +21,19 @@ const navItems = [
 
 export function Header() {
     const [mobileOpen, setMobileOpen] = useState(false)
-    const pathname = usePathname()
+    const pathname = usePathname();
+    const queryClient = useQueryClient();
+
+    const {data, isLoading} = useGetMe();
+    
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        queryClient.setQueryData(["user"], null);
+        toast.success("Logged out Successfully.",{
+            description:"You have been logged out."
+        });
+    };
 
     return (
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
@@ -59,24 +74,45 @@ export function Header() {
                 {/* Right side: auth buttons + mobile toggle */}
                 <div className="flex items-center gap-2.5">
                     <div className="hidden items-center gap-2 sm:flex">
-                        <Link href="/login">
+                        {!isLoading && !data && (
+                            <>
+                                <Link href="/login">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full px-5 text-foreground hover:bg-primary/15">Login
+                                    </Button>
+                                </Link>
+                                <Link href="/register">
+                                    <Button className="rounded-full px-6 shadow-sm">Register</Button>
+                                </Link>
+                            </>
+                        )}
+                        {!isLoading && data && (
                             <Button
-                                variant="ghost"
-                                className="rounded-full px-5 text-foreground hover:bg-primary/15"
-                            >
-                                Login
+                                variant="destructive"
+                                onClick={handleLogout}
+                                className="rounded-full px-5 text-foreground hover:bg-primary/15">Logout
                             </Button>
-                        </Link>
-                        <Link href="/register">
-                            <Button className="rounded-full px-6 shadow-sm">Register</Button>
-                        </Link>
+                        )}
                     </div>
 
-                    <Link href="/register" className="sm:hidden">
-                        <Button className="rounded-full px-5 shadow-sm" size="sm">
-                            Register
-                        </Button>
-                    </Link>
+                    <div className="sm:hidden">
+                        {!isLoading && !data && (
+                            <Link href="/register">
+                                <Button className="rounded-full px-5 shadow-sm" size="sm">
+                                    Register
+                                </Button>
+                            </Link>
+                        )}
+                        {!isLoading && data && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleLogout}
+                                className="rounded-full px-5">Logout
+                            </Button>
+                        )}
+                    </div>
 
                     <Button
                         variant="outline"
@@ -118,14 +154,29 @@ export function Header() {
                         })}
 
                         <li className="mt-2 border-t border-border pt-3">
-                            <Link
-                                href="/login"
-                                onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-primary/15 hover:text-foreground"
-                            >
-                                <User className="size-4" />
-                                Login
-                            </Link>
+                            {!isLoading && !data && (
+                                <Link
+                                    href="/login"
+                                    onClick={() => setMobileOpen(false)}
+                                    className="flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-primary/15 hover:text-foreground"
+                                >
+                                    <User className="size-4" />
+                                    Login
+                                </Link>
+                            )}
+                            {!isLoading && data && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        handleLogout()
+                                        setMobileOpen(false)
+                                    }}
+                                    className="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-destructive transition-all duration-200 hover:bg-destructive/15"
+                                >
+                                    <LogOut className="size-4" />
+                                    Logout
+                                </button>
+                            )}
                         </li>
                     </ul>
                 </div>
