@@ -8,4 +8,8 @@ export function userLogin(payload: { email: string; password: string }) {
 
 export function getMe() {
     return apiClient("/auth/me");
-}
+};
+
+export function googleOAuth(payload: { idToken: string }) {
+    return apiClient("/auth/google", { method: "POST", body: payload });
+};

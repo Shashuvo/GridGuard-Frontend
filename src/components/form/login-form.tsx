@@ -19,6 +19,7 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -27,6 +28,7 @@ import { useLogin } from "@/hooks"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
+import GoogleLoginComponent from "../modules/google-login/GoogleLogin"
 
 
 const inputClass =
@@ -67,7 +69,7 @@ export default function LoginForm({
           localStorage.setItem("refreshToken", refreshToken);
 
           toast.success("Login Successfully.",{
-            description: " Welcome back to GridGuard.",
+            description: "Welcome back to GridGuard.",
             position: "top-right",
           },);
 
@@ -227,6 +229,10 @@ export default function LoginForm({
                   "Login"
                 )}
         </Button>
+
+        <FieldSeparator>Or continue with</FieldSeparator>
+
+        <GoogleLoginComponent></GoogleLoginComponent>
 
         <FieldDescription className="text-center">
           New to GridGuard?{" "}
