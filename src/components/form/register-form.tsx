@@ -29,6 +29,7 @@ import { Spinner } from "../ui/spinner";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import GoogleLoginComponent from "../modules/google-login/GoogleLogin";
+import { getErrorMessage } from "@/lib/getErrorMessage";
 
 const inputClass =
     "h-11 rounded-full border-input bg-background pl-11 text-[15px] shadow-xs transition-shadow focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20";
@@ -158,7 +159,7 @@ export function RegisterForm() {
                 },
                 onError: (err) => {
                     toast.error("Server Failure.",{
-                        description: err.message,
+                        description: getErrorMessage(err),
                         position: "top-right"
                     });
                 },

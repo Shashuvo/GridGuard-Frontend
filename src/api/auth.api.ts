@@ -1,5 +1,5 @@
 import apiClient from "@/lib/apiClient";
-import type { LoginPayload, RegistrationPayload } from "@/types";
+import type { LoginPayload, RegistrationPayload, VerifyAccountPayload } from "@/types";
 
 
 
@@ -17,4 +17,8 @@ export function googleOAuth(payload: { idToken: string }) {
 
 export function userRegistration(payload: RegistrationPayload) {
     return apiClient("/auth/register", { method: "POST", body: payload });
+};
+
+export function verifyAccount(payload: VerifyAccountPayload) {
+    return apiClient("/auth/verify-email", { method: "POST", body: payload });
 }
