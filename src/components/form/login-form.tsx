@@ -1,17 +1,23 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
 import { useForm } from "@tanstack/react-form"
+import { useQueryClient } from "@tanstack/react-query"
 import {
   Eye,
   EyeOff,
   Loader2,
   Lock,
+  type LucideIcon,
   Mail,
+  ShieldCheck,
   TriangleAlert,
+  UserRound,
+  Wrench,
 } from "lucide-react"
-
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -22,17 +28,22 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
-import { loginSchema } from "@/validation"
 import { useLogin } from "@/hooks"
-import { useRouter } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { type DemoAccount, type DemoRole, demoAccounts } from "@/lib/demo-accounts"
+import { cn } from "@/lib/utils"
+import type { LoginPayload } from "@/types"
+import { loginSchema } from "@/validation"
 import GoogleLoginComponent from "../modules/google-login/GoogleLogin"
 
 
 const inputClass =
   "h-11 rounded-full border-input bg-background pl-11 text-[15px] shadow-xs transition-shadow focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20"
+
+const demoIcons: Record<DemoRole, LucideIcon> = {
+  admin: ShieldCheck,
+  customer: UserRound,
+  technician: Wrench,
+}
 
 export default function LoginForm({
   className,
@@ -40,13 +51,43 @@ export default function LoginForm({
 }: React.ComponentProps<"form">) {
   const [showPassword, setShowPassword] = useState(false)
   const [capsLock, setCapsLock] = useState(false)
+  const [demoRole, setDemoRole] = useState<DemoRole | null>(null)
   const {
-    mutateAsync: login,
+    mutate: login,
     isPending: loginPending,
   } = useLogin();
   const router = useRouter();
   const queryClient = useQueryClient();
-  
+
+  const loginWithCredentials = (credentials: LoginPayload, demoLabel?: string) => {
+    login(credentials, {
+      onSuccess: (res) => {
+        const { accessToken, refreshToken } = res.data;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        toast.success("Login successfully.", {
+          description: demoLabel
+            ? `Signed in as demo ${demoLabel}.`
+            : "Welcome back to GridGuard.",
+          position: "top-right",
+        });
+
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+
+        router.push("/");
+      },
+      onError: (err) => {
+        toast.error("Login failed.", {
+          description: err.message || "Failed to login, please try again later.",
+          position: "top-right",
+        });
+      },
+      onSettled: () => setDemoRole(null),
+    });
+  };
+
   const form = useForm({
     defaultValues: {
       email: "admin@gridguard.com",
@@ -56,41 +97,24 @@ export default function LoginForm({
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      const loginData = {
-        email: value.email,
-        password: value.password,
-      };
-
-      login(loginData, {
-        onSuccess: (res) => {
-          const { accessToken, refreshToken } = res.data;
-
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
-
-          toast.success("Login Successfully.",{
-            description: "Welcome back to GridGuard.",
-            position: "top-right",
-          },);
-
-          queryClient.invalidateQueries({ queryKey: ["user"] });
-
-          router.push("/");
-        },
-        onError: (err) => {
-          toast.success("Login Error.",{
-            description: err.message || "Failed to login, Please try again later.",
-            position: "top-right",
-          },);
-        },
-      });
+      loginWithCredentials({ email: value.email, password: value.password });
     },
   });
+
+  const handleDemoLogin = (account: DemoAccount) => {
+    setDemoRole(account.role);
+    form.setFieldValue("email", account.email);
+    form.setFieldValue("password", account.password);
+    loginWithCredentials(
+      { email: account.email, password: account.password },
+      account.label,
+    );
+  };
 
   return (
     <form
       noValidate
-      className={cn("flex flex-col gap-5", className)}
+      className={cn("flex flex-col gap-4", className)}
       {...props}
       onSubmit={(e) => {
         e.preventDefault()
@@ -98,15 +122,63 @@ export default function LoginForm({
         form.handleSubmit()
       }}
     >
-      <FieldGroup>
-        <div className="flex flex-col gap-2 text-left">
+      {/* Tighter on short screens so the whole form fits without scrolling */}
+      <FieldGroup className="gap-4 [@media(max-height:760px)]:gap-3">
+        <div className="flex flex-col gap-1.5 text-left">
           <h1 className="font-serif text-3xl font-bold tracking-tight">
             Welcome back
           </h1>
-          <p className="text-balance text-[15px] leading-relaxed text-muted-foreground [@media(max-height:720px)]:hidden">
+          <p className="text-balance text-[15px] leading-relaxed text-muted-foreground [@media(max-height:820px)]:hidden">
             Log in to check schedules, report outages and follow repairs.
           </p>
         </div>
+
+        {/* Demo accounts: one compact row. Phones stack the label above and
+            put each icon above its name; from sm up it is a single line. */}
+        <fieldset className="flex flex-col gap-2 rounded-2xl border border-dashed border-border bg-muted/30 p-2.5 sm:flex-row sm:items-center sm:gap-3">
+          <legend className="sr-only">One-click demo login</legend>
+          <span
+            aria-hidden
+            className="px-1 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase sm:shrink-0"
+          >
+            Demo
+          </span>
+          <div className="grid flex-1 grid-cols-3 gap-1.5">
+            {demoAccounts.map((account) => {
+              const Icon = demoIcons[account.role]
+              const active = demoRole === account.role
+
+              return (
+                <Button
+                  key={account.role}
+                  type="button"
+                  variant="outline"
+                  disabled={loginPending}
+                  onClick={() => handleDemoLogin(account)}
+                  title={account.description}
+                  aria-label={`Log in as demo ${account.label}. ${account.description}`}
+                  className={cn(
+                    "h-auto min-w-0 flex-col gap-1 rounded-xl bg-background px-2 py-2 text-xs font-medium transition-colors hover:border-primary/50 hover:bg-primary/10 sm:h-9 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3",
+                    active && "border-primary bg-primary/15",
+                  )}
+                >
+                  {active ? (
+                    <Loader2
+                      className="size-3.5 shrink-0 animate-spin text-primary-foreground dark:text-primary"
+                      aria-hidden
+                    />
+                  ) : (
+                    <Icon
+                      className="size-3.5 shrink-0 text-primary-foreground dark:text-primary"
+                      aria-hidden
+                    />
+                  )}
+                  <span className="truncate">{account.label}</span>
+                </Button>
+              )
+            })}
+          </div>
+        </fieldset>
 
         {/* Email */}
         <form.Field
@@ -216,23 +288,23 @@ export default function LoginForm({
 
         {/* Submit */}
         <Button
-                type="submit"
-                disabled={loginPending}
-                className="h-12 rounded-full text-base font-semibold shadow-md shadow-primary/30 transition-all hover:shadow-lg hover:shadow-primary/40 active:scale-[0.99] motion-reduce:transition-none"
-              >
-                {loginPending ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" aria-hidden />
-                    Logging in
-                  </>
-                ) : (
-                  "Login"
-                )}
+          type="submit"
+          disabled={loginPending}
+          className="h-11 rounded-full text-base font-semibold shadow-md shadow-primary/30 transition-all hover:shadow-lg hover:shadow-primary/40 active:scale-[0.99] motion-reduce:transition-none"
+        >
+          {loginPending && !demoRole ? (
+            <>
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+              Logging in
+            </>
+          ) : (
+            "Login"
+          )}
         </Button>
 
         <FieldSeparator>Or continue with</FieldSeparator>
 
-        <GoogleLoginComponent></GoogleLoginComponent>
+        <GoogleLoginComponent />
 
         <FieldDescription className="text-center">
           New to GridGuard?{" "}

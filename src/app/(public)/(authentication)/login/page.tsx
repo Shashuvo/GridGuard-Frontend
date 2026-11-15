@@ -1,20 +1,19 @@
 import Link from "next/link"
-import { Wrench } from "lucide-react"
 
 import LoginForm from "@/components/form/login-form"
 import { Button } from "@/components/ui/button"
 import { LogoMark } from "@/components/layout/public/LogoMark"
-import Image from "next/image"
 
 export default function LoginPage() {
   return (
-    <div className="grid min-h-svh lg:h-svh lg:overflow-hidden lg:grid-cols-2">
+    // Phones and tablets scroll normally. From lg up the page is exactly one screen tall.
+    <div className="grid min-h-svh lg:h-svh lg:grid-cols-2 lg:overflow-hidden">
       {/* Left: form */}
-      <div className="relative isolate flex min-h-0 flex-col gap-4 overflow-hidden p-6 md:p-8">
+      <div className="relative isolate flex min-h-0 flex-col gap-3 overflow-x-hidden p-4 sm:p-6 lg:overflow-y-auto lg:p-8">
         {/* soft glow */}
         <div
           aria-hidden
-          className="absolute -top-40 -left-40 -z-10 size-112 rounded-full bg-muted-foreground/15 blur-3xl"
+          className="absolute -top-40 -left-40 -z-10 size-96 rounded-full bg-muted-foreground/15 blur-3xl sm:size-112"
         />
         {/* faint dot grid, fading out toward the edges */}
         <div
@@ -31,14 +30,14 @@ export default function LoginPage() {
           }}
         />
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3">
           <Link
             href="/"
             aria-label="GridGuard home"
-            className="group flex items-center gap-1 text-lg font-semibold"
+            className="group flex items-center gap-2 text-lg font-semibold sm:gap-2.5"
           >
-            <LogoMark className="size-10 drop-shadow-sm transition-transform duration-200 group-hover:scale-105" />
-            <span className="font-serif text-xl tracking-tight">
+            <LogoMark className="size-9 drop-shadow-sm transition-transform duration-200 group-hover:scale-105 sm:size-10" />
+            <span className="font-serif text-lg tracking-tight sm:text-xl">
               Grid
               <span className="text-primary-foreground dark:text-primary">
                 Guard
@@ -49,20 +48,21 @@ export default function LoginPage() {
           <Button
             asChild
             variant="outline"
-            className="rounded-full bg-background/70 px-5 backdrop-blur"
+            className="h-10 rounded-full bg-background/70 px-4 backdrop-blur sm:px-5"
           >
             <Link href="/register">Register</Link>
           </Button>
         </div>
 
-        <div className="flex flex-1 items-center justify-center py-2">
-          {/* One entrance on load; skipped for reduced-motion users */}
-          <div className="w-full max-w-md rounded-3xl border bg-card/80 p-6 shadow-xl shadow-black/5 backdrop-blur motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 sm:p-8">
+        {/* Card is centred; the column only scrolls if the window is extremely short */}
+        <div className="flex flex-1 items-start justify-center py-1 md:items-center">
+          <div className="w-full max-w-md rounded-3xl border bg-card/80 p-5 shadow-xl shadow-black/5 backdrop-blur motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 sm:p-6">
             <LoginForm />
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        {/* Dropped on short screens to give the form the room */}
+        <div className="flex flex-col items-center gap-1 text-xs text-muted-foreground sm:flex-row sm:justify-between [@media(max-height:760px)]:hidden">
           <p>© 2026 GridGuard</p>
           <nav aria-label="Legal" className="flex gap-4">
             <Link href="/terms" className="hover:text-foreground">
@@ -75,17 +75,16 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right: photo. Put your image at public/login.jpg */}
-      <div className="relative hidden overflow-hidden bg-neutral-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-8.5">
-        {/* Decorative photo. A CSS background shows the dark fallback
-            instead of a broken-image icon if the file is missing. */}
-        <Image
-        src="/login.jpg"
-        alt="Login Page Image"
-        fill
-        priority
-        sizes="40vw"
-        className="object-cover dark:brightness-75"
+      {/* Right: photo (large screens only). Put your image at public/login.jpg */}
+      <div className="relative hidden overflow-hidden bg-neutral-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-10">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center dark:brightness-75"
+          style={{ backgroundImage: "url('/login.jpg')" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-b from-black/45 via-black/10 to-black/80"
         />
 
         <div className="relative flex w-fit items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3.5 py-1.5 text-sm text-white/90 backdrop-blur-sm">
@@ -96,40 +95,10 @@ export default function LoginPage() {
           Updates in real time
         </div>
 
-        <div className="relative flex flex-col gap-8">
+        <div className="relative flex flex-col gap-6">
           <p className="max-w-md font-serif text-4xl leading-tight">
             Know when the power goes, and when it&apos;s coming back.
           </p>
-
-          {/* Sample status card. Static example, not real data. */}
-          <div
-            aria-hidden
-            className="max-w-md rounded-2xl border border-white/15 bg-black/35 p-5 backdrop-blur-md"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm text-white/80">
-                <Wrench className="size-4" />
-                Outage on Station Road
-              </div>
-              <span className="rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary">
-                Technician on the way
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-3 gap-1.5">
-              <span className="h-1.5 rounded-full bg-primary" />
-              <span className="h-1.5 rounded-full bg-primary" />
-              <span className="h-1.5 rounded-full bg-white/20" />
-            </div>
-            <div className="mt-2 grid grid-cols-3 gap-1.5 text-xs text-white/60">
-              <span>Reported</span>
-              <span>Assigned</span>
-              <span>Restored</span>
-            </div>
-            <p className="mt-4 text-sm text-white/70">
-              Estimated restore time: 12:00 PM
-            </p>
-          </div>
         </div>
       </div>
     </div>
