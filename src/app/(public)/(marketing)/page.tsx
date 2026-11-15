@@ -16,7 +16,7 @@ export default function HomePage() {
         <div>
             <HeroSection/>
             <FeaturesSection/>
-            {/* <PackagesSection/> */}
+            <PackagesSection/>
             <FaqSection/>
             <CtaSection/>
         </div>
