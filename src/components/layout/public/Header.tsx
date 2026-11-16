@@ -3,14 +3,24 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Activity, CalendarClock, House, Info, LogOut, Menu, User, X } from "lucide-react"
+import {
+    Activity,
+    CalendarClock,
+    House,
+    Info,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    User,
+    X,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { LogoMark } from "./LogoMark"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
 import { useGetMe } from "@/hooks"
+import { dashboardRoutes, type UserRole } from "@/lib/role-config"
+import { UserMenu, useLogout } from "./user-menu"
 
 const navItems = [
     { label: "Home", href: "/", icon: House },
@@ -21,19 +31,28 @@ const navItems = [
 
 export function Header() {
     const [mobileOpen, setMobileOpen] = useState(false)
-    const pathname = usePathname();
-    const queryClient = useQueryClient();
+    const pathname = usePathname()
 
-    const {data, isLoading} = useGetMe();
-    
-    const handleLogout = () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        queryClient.setQueryData(["user"], null);
-        toast.success("Logged out Successfully.",{
-            description:"You have been logged out."
-        });
-    };
+    const { data, isLoading } = useGetMe()
+    const user = data?.data
+    const logout = useLogout()
+
+    // Logged-in people get a Dashboard link that goes to the right place for their role
+    const items = [
+        ...navItems,
+        ...(user
+            ? [
+                  {
+                      label: "Dashboard",
+                      href: dashboardRoutes[user.role as UserRole],
+                      icon: LayoutDashboard,
+                  },
+              ]
+            : []),
+    ]
+
+    const isActive = (href: string) =>
+        href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
 
     return (
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
@@ -49,16 +68,17 @@ export function Header() {
 
                 {/* Desktop nav links */}
                 <ul className="hidden items-center gap-1 rounded-full border border-border bg-card/60 p-1 shadow-sm md:flex">
-                    {navItems.map((item) => {
+                    {items.map((item) => {
                         const Icon = item.icon
-                        const isActive = pathname === item.href
+                        const active = isActive(item.href)
                         return (
                             <li key={item.href}>
                                 <Link
                                     href={item.href}
+                                    aria-current={active ? "page" : undefined}
                                     className={cn(
                                         "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                                        isActive
+                                        active
                                             ? "bg-primary text-primary-foreground shadow-sm"
                                             : "text-muted-foreground hover:bg-primary/15 hover:text-foreground",
                                     )}
@@ -71,48 +91,36 @@ export function Header() {
                     })}
                 </ul>
 
-                {/* Right side: auth buttons + mobile toggle */}
+                {/* Right side: auth buttons or avatar, plus mobile toggle */}
                 <div className="flex items-center gap-2.5">
-                    <div className="hidden items-center gap-2 sm:flex">
-                        {!isLoading && !data && (
-                            <>
-                                <Link href="/login">
-                                    <Button
-                                        variant="ghost"
-                                        className="rounded-full px-5 text-foreground hover:bg-primary/15">Login
-                                    </Button>
-                                </Link>
-                                <Link href="/register">
-                                    <Button className="rounded-full px-6 shadow-sm">Register</Button>
-                                </Link>
-                            </>
-                        )}
-                        {!isLoading && data && (
-                            <Button
-                                variant="destructive"
-                                onClick={handleLogout}
-                                className="rounded-full px-5 text-foreground hover:bg-primary/15">Logout
-                            </Button>
-                        )}
-                    </div>
+                    {/* Logged in: avatar with image, or initials when there is no image */}
+                    {user && <UserMenu />}
 
-                    <div className="sm:hidden">
-                        {!isLoading && !data && (
-                            <Link href="/register">
-                                <Button className="rounded-full px-5 shadow-sm" size="sm">
-                                    Register
+                    {!isLoading && !user && (
+                        <>
+                            <div className="hidden items-center gap-2 sm:flex">
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    className="rounded-full px-5 text-foreground hover:bg-primary/15"
+                                >
+                                    <Link href="/login">Login</Link>
                                 </Button>
-                            </Link>
-                        )}
-                        {!isLoading && data && (
-                            <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={handleLogout}
-                                className="rounded-full px-5">Logout
-                            </Button>
-                        )}
-                    </div>
+                                <Button asChild className="rounded-full px-6 shadow-sm">
+                                    <Link href="/register">Register</Link>
+                                </Button>
+                            </div>
+
+                            <div className="sm:hidden">
+                                <Button asChild className="rounded-full px-5 shadow-sm" size="sm">
+                                    <Link href="/register">Register</Link>
+                                </Button>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Keeps the avatar spot from jumping while the user loads */}
+                    {isLoading && <div className="size-10 rounded-full bg-muted motion-safe:animate-pulse" />}
 
                     <Button
                         variant="outline"
@@ -131,17 +139,18 @@ export function Header() {
             {mobileOpen && (
                 <div className="border-t border-border bg-background/95 backdrop-blur-md md:hidden">
                     <ul className="mx-auto flex max-w-6xl flex-col gap-1.5 px-4 py-4 sm:px-6">
-                        {navItems.map((item) => {
+                        {items.map((item) => {
                             const Icon = item.icon
-                            const isActive = pathname === item.href
+                            const active = isActive(item.href)
                             return (
                                 <li key={item.href}>
                                     <Link
                                         href={item.href}
                                         onClick={() => setMobileOpen(false)}
+                                        aria-current={active ? "page" : undefined}
                                         className={cn(
                                             "flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200",
-                                            isActive
+                                            active
                                                 ? "bg-primary text-primary-foreground shadow-sm"
                                                 : "text-muted-foreground hover:bg-primary/15 hover:text-foreground",
                                         )}
@@ -154,7 +163,7 @@ export function Header() {
                         })}
 
                         <li className="mt-2 border-t border-border pt-3">
-                            {!isLoading && !data && (
+                            {!isLoading && !user && (
                                 <Link
                                     href="/login"
                                     onClick={() => setMobileOpen(false)}
@@ -164,18 +173,28 @@ export function Header() {
                                     Login
                                 </Link>
                             )}
-                            {!isLoading && data && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        handleLogout()
-                                        setMobileOpen(false)
-                                    }}
-                                    className="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-destructive transition-all duration-200 hover:bg-destructive/15"
-                                >
-                                    <LogOut className="size-4" />
-                                    Logout
-                                </button>
+                            {user && (
+                                <div className="flex flex-col gap-1.5">
+                                    <Link
+                                        href="/profile"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-primary/15 hover:text-foreground"
+                                    >
+                                        <User className="size-4" />
+                                        Profile
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            logout()
+                                            setMobileOpen(false)
+                                        }}
+                                        className="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium text-destructive transition-all duration-200 hover:bg-destructive/15"
+                                    >
+                                        <LogOut className="size-4" />
+                                        Logout
+                                    </button>
+                                </div>
                             )}
                         </li>
                     </ul>
