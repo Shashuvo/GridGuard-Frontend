@@ -1,0 +1,18 @@
+/** biome-ignore-all lint/a11y/useValidAriaRole: <explanation */
+import RoleGuard from "@/components/auth/role-guard";
+import DashboardShell from "@/components/dashboard/dashboard-shell";
+import type { ReactNode } from "react";
+
+export default function layout({
+    children,
+}: {
+    children: ReactNode;
+}) {
+    return (
+        <RoleGuard roles={["CUSTOMER"]}>
+            <DashboardShell role="CUSTOMER">
+                {children}
+            </DashboardShell>
+        </RoleGuard>
+    );
+}
