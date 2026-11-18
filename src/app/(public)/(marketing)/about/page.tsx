@@ -10,7 +10,6 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-
 import { SectionHeading } from "@/components/shared/section-heading";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -99,7 +98,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative isolate overflow-hidden py-14 sm:py-20 lg:py-28">
+      <section className="relative isolate overflow-hidden py-12 sm:py-16 lg:py-24">
         <div
           aria-hidden
           className="absolute -top-40 left-1/2 -z-10 size-96 -translate-x-1/2 rounded-full bg-muted-foreground/15 blur-3xl sm:size-128"
@@ -132,12 +131,12 @@ export default function AboutPage() {
             About GridGuard
           </div>
 
-          <h1 className="max-w-3xl text-balance font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="isolate max-w-4xl text-balance font-serif text-4xl leading-[1.12] font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Keeping every neighbourhood{" "}
             <span className="relative whitespace-nowrap">
               <span
                 aria-hidden
-                className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-primary/60 sm:h-4"
+                className="absolute inset-x-0 bottom-[0.12em] -z-10 h-[0.26em] rounded-full bg-primary/60"
               />
               in the loop
             </span>
@@ -198,7 +197,7 @@ export default function AboutPage() {
 
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-3xl border bg-muted shadow-xl shadow-black/10">
             <Image
-              src="/register.jpg"
+              src="/about.jpg"
               alt="A technician working on power lines"
               fill
               sizes="(min-width: 1024px) 560px, 100vw"
