@@ -7,3 +7,5 @@ export * from "./sidebar.types";
 export * from "./user.types";
 export * from "./outage.types";
 export * from "./admin.types";
+export * from "./common.types";
+export * from "./scheduled-outage.types"
