@@ -31,6 +31,7 @@ export function useLogout(redirectTo?: string) {
         queryClient.setQueryData(["user"], null)
         toast.success("Logged out Successfully.", {
             description: "You have been logged out.",
+            position: "top-right",
         })
         if (redirectTo) router.push(redirectTo)
     }
@@ -76,9 +77,9 @@ export function UserMenu({ redirectTo }: { redirectTo?: string }) {
                 </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-64 rounded-2xl p-2 shadow-lg">
+            <DropdownMenuContent side="bottom" align="end" sideOffset={10} className="w-64 rounded-2xl p-2 shadow-lg">
                 <DropdownMenuGroup>
-                    <DropdownMenuLabel className="px-2 py-2">
+                    <DropdownMenuLabel className="px-3 py-2">
                         <div className="flex items-center gap-3">
                             <Avatar className="size-10">
                                 {photo && <AvatarImage src={photo} alt="" />}
@@ -108,7 +109,7 @@ export function UserMenu({ redirectTo }: { redirectTo?: string }) {
                         { label: "Dashboard", href: dashboardRoutes[role], icon: LayoutDashboard },
                         { label: "Profile", href: "/profile", icon: User },
                     ].map(({ label, href, icon: Icon }) => (
-                        <DropdownMenuItem key={label} asChild className="gap-2.5 rounded-lg py-2">
+                        <DropdownMenuItem key={label} asChild className="gap-2.5 rounded-xl px-3 py-2.5">
                             <Link href={href}>
                                 <span className="flex size-7 items-center justify-center rounded-full bg-primary/20 text-primary-foreground dark:text-primary">
                                     <Icon className="size-3.5" aria-hidden />
@@ -123,7 +124,7 @@ export function UserMenu({ redirectTo }: { redirectTo?: string }) {
 
                 <DropdownMenuItem
                     variant="destructive"
-                    className="gap-2.5 rounded-lg py-2"
+                    className="gap-2.5 rounded-xl px-3 py-2.5"
                     onSelect={logout}
                 >
                     <span className="flex size-7 items-center justify-center rounded-full bg-destructive/10">

@@ -128,12 +128,12 @@ export default function MyReportsPage() {
               >
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl">
-                <SelectItem value="ALL">All Status</SelectItem>
-                <SelectItem value="REPORTED">Reported</SelectItem>
-                <SelectItem value="ASSIGNED">Assigned</SelectItem>
-                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                <SelectItem value="RESOLVED">Resolved</SelectItem>
+              <SelectContent position="popper" side="bottom" align="start" sideOffset={8} className="rounded-2xl p-1.5">
+                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" value="ALL">All Status</SelectItem>
+                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" value="REPORTED">Reported</SelectItem>
+                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" value="ASSIGNED">Assigned</SelectItem>
+                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" value="RESOLVED">Resolved</SelectItem>
               </SelectContent>
             </Select>
           </div>

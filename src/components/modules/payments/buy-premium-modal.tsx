@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import { useGetPublicAreas, useBuyPremium } from "@/hooks";
 import { getErrorMessage } from "@/lib/getErrorMessage";
 import type { IPackage } from "@/types";
@@ -24,7 +25,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGetMe } from "@/hooks";
 import { Lock, MapPin, Zap } from "lucide-react";
-import { toast } from "sonner";
 
 interface Props {
   pkg: IPackage | null;
@@ -64,10 +64,10 @@ export default function BuyPremiumModal({ pkg, onClose }: Props) {
           }
         },
         onError: (err) => {
-          toast.error("Payment Failed.",{
+          toast.error("Payment Failed.", {
             description: getErrorMessage(err),
-            position: "top-right"
-          })
+            position: "top-right",
+          });
         },
       }
     );
@@ -121,9 +121,9 @@ export default function BuyPremiumModal({ pkg, onClose }: Props) {
                 >
                   <SelectValue placeholder="Select your area" />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl">
+                <SelectContent position="popper" side="bottom" align="start" sideOffset={8} className="rounded-2xl p-1.5">
                   {areas.map((area) => (
-                    <SelectItem key={area.id} value={area.id}>
+                    <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" key={area.id} value={area.id}>
                       {area.name}, {area.district}
                     </SelectItem>
                   ))}

@@ -19,12 +19,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import { useReportOutage, useGetPublicAreas } from "@/hooks";
 import { getErrorMessage } from "@/lib/getErrorMessage";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 const reportOutageSchema = z.object({
     areaId: z.string().min(1, "Please select an area"),
@@ -52,23 +52,23 @@ export default function ReportOutageForm() {
             reportOutage(value, {
                 onSuccess: (res) => {
                     if (!res.success) {
-                        toast.error("Server Failure",{
+                        toast.error("Server Failure.", {
                             description: "Something went wrong. Please try again",
-                            position: "top-right"
-                        })
+                            position: "top-right",
+                        });
                         return;
                     }
-                    toast.success("Outage Reported",{
-                        description: "Your report has been submitted successfully.",
-                        position: "top-right"
-                    })
+                    toast.success("Outage Reported.", {
+                        description: "Your report has been submitted successfully",
+                        position: "top-right",
+                    });
                     queryClient.invalidateQueries({ queryKey: ["my-reports","unexpected-outages-by-area"] });
                     router.push("/dashboard/my-reports");
                 },
                 onError: (err) => {
-                    toast.error("Failed",{
+                    toast.error("Failed.", {
                         description: getErrorMessage(err),
-                        position: "top-right"
+                        position: "top-right",
                     });
                 },
             });
@@ -128,9 +128,9 @@ export default function ReportOutageForm() {
                                             </SelectValue>
                                         </SelectTrigger>
 
-                                        <SelectContent className="rounded-2xl">
+                                        <SelectContent position="popper" side="bottom" align="start" sideOffset={8} className="rounded-2xl p-1.5">
                                             {areas.map((area) => (
-                                                <SelectItem key={area.id} value={area.id}>
+                                                <SelectItem className="rounded-xl py-2.5 pr-9 pl-3" key={area.id} value={area.id}>
                                                     {area.name}, {area.district}
                                                 </SelectItem>
                                             ))}
