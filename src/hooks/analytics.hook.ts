@@ -6,4 +6,5 @@ export function useGetCustomerAnalytics() {
       queryKey: ["customer-analytics"],
       queryFn: getCustomerAnalytics,
     });
-}
+};
+

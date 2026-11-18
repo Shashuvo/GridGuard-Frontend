@@ -6,3 +6,4 @@ export * from "./technician.types";
 export * from "./sidebar.types";
 export * from "./user.types";
 export * from "./outage.types";
+export * from "./admin.types";
