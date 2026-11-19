@@ -286,7 +286,7 @@ export default function AreasPage() {
             </span>
             <div className="min-w-0">
               <DialogTitle className={dialogTitleClass}>Edit area</DialogTitle>
-              <DialogDescription>Update this area's name, district or city.</DialogDescription>
+              <DialogDescription>Update this area&apos;s name, district or city.</DialogDescription>
             </div>
           </DialogHeader>
           {editArea && (
