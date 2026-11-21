@@ -4,6 +4,7 @@ import type { PaymentStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
 // One place for how each status looks, so the table and the modal always agree.
+// Same colours as the dashboard and the admin payments table.
 export const paymentStatus: Record<
   PaymentStatus,
   { label: string; icon: LucideIcon; badge: string; circle: string }
@@ -45,7 +46,7 @@ export function PaymentStatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
+        "inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap",
         badge,
         className,
       )}
@@ -56,8 +57,9 @@ export function PaymentStatusBadge({
   );
 }
 
-export const formatMoney = (amount: number) =>
-  `৳${amount.toLocaleString("en-US")}`;
+// Number() so it also works when the API sends the amount as a string
+export const formatMoney = (amount: number | string) =>
+  `৳${Number(amount).toLocaleString("en-US")}`;
 
 export const formatDate = (iso: string, withTime = false) =>
   new Date(iso).toLocaleString("en-GB", {
