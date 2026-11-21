@@ -8,3 +8,17 @@ export interface IPackage {
     createdAt: string;
     updatedAt: string;
 }
+  
+export interface CreatePackagePayload {
+    name: string;
+    description: string;
+    price: number;
+    durationDays: number;
+}
+  
+export interface UpdatePackagePayload {
+    name?: string;
+    description?: string;
+    price?: number;
+    durationDays?: number;
+}

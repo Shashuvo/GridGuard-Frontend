@@ -74,10 +74,10 @@ export default function TechnicianDetailsSheet({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex min-w-0 max-w-full flex-col items-center gap-1">
-                  <h2 className="max-w-full truncate font-serif text-2xl font-semibold tracking-tight lg:text-3xl">
+                  <h2 className="max-w-full font-serif text-2xl font-semibold tracking-tight wrap-break-word lg:text-3xl">
                     {technician.name}
                   </h2>
-                  <p className="max-w-full truncate text-sm text-muted-foreground">
+                  <p className="max-w-full text-sm break-all text-muted-foreground">
                     {technician.email}
                   </p>
                 </div>

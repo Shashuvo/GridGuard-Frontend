@@ -18,6 +18,10 @@ interface Props {
 
 const headClass = "h-11 px-4 font-medium";
 
+// Turns amber on hover, same as the rest of the admin buttons
+const viewButtonClass =
+  "rounded-full border-input bg-background shadow-xs hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:shadow-primary/30 focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:transition-all motion-reduce:transition-none dark:hover:bg-primary";
+
 // A short table: who they are, where they stand, when they applied.
 // Everything else lives in the details panel.
 // The card in the page already provides the border and rounded corners,
@@ -60,79 +64,113 @@ export default function TechniciansTable({
   }
 
   return (
-    // table-fixed + column widths spread the columns evenly, so the middle is never a big empty gap
-    <table className="w-full table-fixed text-sm">
-      <thead className="bg-muted/40 text-left text-muted-foreground">
-        <tr className="border-b">
-          <th scope="col" className={`${headClass} w-[46%] sm:w-[34%]`}>
-            Technician
-          </th>
-          <th scope="col" className={`${headClass} w-[32%] sm:w-[20%]`}>
-            Status
-          </th>
-          <th scope="col" className={`${headClass} hidden sm:table-cell sm:w-[24%]`}>
-            Applied
-          </th>
-          <th scope="col" className={`${headClass} w-[22%] text-right`}>
-            <span className="sr-only">Details</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
+    <>
+      {/* Phones and small tablets: one card per technician, so nothing is squeezed or overlaps */}
+      <ul className="flex flex-col gap-3 p-3 md:hidden">
         {technicians.map((tech) => (
-          <tr
-            key={tech.id}
-            // Mouse users click anywhere on the row. Keyboard users use the View details button.
-            onClick={() => onSelect(tech.id)}
-            className="cursor-pointer border-b last:border-0 hover:bg-primary/5"
-          >
-            <td className="px-4 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <Avatar className="size-10 shrink-0">
-                  {tech.user.imageUrl && <AvatarImage src={tech.user.imageUrl} alt="" />}
-                  <AvatarFallback className="bg-primary/20 font-semibold text-primary-foreground dark:text-primary">
-                    {tech.name?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 text-left">
-                  <p className="truncate font-medium">{tech.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{tech.email}</p>
-                  {/* On phones the Applied column is hidden, so the date moves here */}
-                  <p className="mt-0.5 text-xs text-muted-foreground sm:hidden">
-                    Applied {format(new Date(tech.createdAt), "dd MMM yyyy")}
-                  </p>
-                </div>
+          <li key={tech.id} className="flex flex-col gap-4 rounded-2xl border bg-card p-4">
+            <div className="flex items-start gap-3">
+              <Avatar className="size-12 shrink-0">
+                {tech.user.imageUrl && <AvatarImage src={tech.user.imageUrl} alt="" />}
+                <AvatarFallback className="bg-primary/20 font-semibold text-primary-foreground dark:text-primary">
+                  {tech.name?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {/* The full name and email wrap onto more lines instead of being cut off */}
+              <div className="min-w-0 flex-1">
+                <p className="font-medium wrap-break-word">{tech.name}</p>
+                <p className="text-xs break-all text-muted-foreground">{tech.email}</p>
               </div>
-            </td>
-            <td className="px-4 py-3">
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
               <StatusBadge status={tech.verificationStatus} />
-            </td>
-            <td className="hidden px-4 py-3 whitespace-nowrap sm:table-cell">
-              <span className="text-muted-foreground">
-                {format(new Date(tech.createdAt), "dd MMM yyyy")}
+              <span className="text-xs text-muted-foreground">
+                Applied {format(new Date(tech.createdAt), "dd MMM yyyy")}
               </span>
-            </td>
-            <td className="px-4 py-3">
-              <div className="flex justify-end">
-                {/* Icon only on phones, with text from sm up. Turns amber on hover. */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelect(tech.id);
-                  }}
-                  aria-label={`View details for ${tech.name}`}
-                  className="size-10 rounded-full border-input bg-background p-0 shadow-xs hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:shadow-primary/30 focus-visible:ring-4 focus-visible:ring-primary/20 motion-safe:transition-all motion-reduce:transition-none dark:hover:bg-primary sm:h-9 sm:w-auto sm:gap-2 sm:px-4"
-                >
-                  <Eye className="size-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">View details</span>
-                </Button>
-              </div>
-            </td>
-          </tr>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onSelect(tech.id)}
+              aria-label={`View details for ${tech.name}`}
+              className={`h-11 w-full ${viewButtonClass}`}
+            >
+              <Eye className="size-4" aria-hidden="true" />
+              View details
+            </Button>
+          </li>
         ))}
-      </tbody>
-    </table>
+      </ul>
+
+      {/* From md up: a table */}
+      <table className="hidden w-full table-fixed text-sm md:table">
+        <thead className="bg-muted/40 text-left text-muted-foreground">
+          <tr className="border-b">
+            <th scope="col" className={`${headClass} w-[32%]`}>
+              Technician
+            </th>
+            <th scope="col" className={`${headClass} w-[18%]`}>
+              Status
+            </th>
+            <th scope="col" className={`${headClass} w-[22%]`}>
+              Applied
+            </th>
+            <th scope="col" className={`${headClass} w-[28%] text-right`}>
+              <span className="sr-only">Details</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {technicians.map((tech) => (
+            <tr
+              key={tech.id}
+              // Mouse users click anywhere on the row. Keyboard users use the View details button.
+              onClick={() => onSelect(tech.id)}
+              className="cursor-pointer border-b last:border-0 hover:bg-primary/5"
+            >
+              <td className="px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar className="size-10 shrink-0">
+                    {tech.user.imageUrl && <AvatarImage src={tech.user.imageUrl} alt="" />}
+                    <AvatarFallback className="bg-primary/20 font-semibold text-primary-foreground dark:text-primary">
+                      {tech.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 text-left">
+                    <p className="line-clamp-2 font-medium wrap-break-word">{tech.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{tech.email}</p>
+                  </div>
+                </div>
+              </td>
+              <td className="px-4 py-3">
+                <StatusBadge status={tech.verificationStatus} />
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                {format(new Date(tech.createdAt), "dd MMM yyyy")}
+              </td>
+              <td className="px-4 py-3">
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelect(tech.id);
+                    }}
+                    aria-label={`View details for ${tech.name}`}
+                    className={`h-9 gap-2 px-4 whitespace-nowrap ${viewButtonClass}`}
+                  >
+                    <Eye className="size-4" aria-hidden="true" />
+                    View details
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
