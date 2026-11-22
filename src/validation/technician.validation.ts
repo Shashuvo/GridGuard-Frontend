@@ -69,3 +69,8 @@ export const technicianApplicationSchema = z.object({
     message: "A resume or CV is required",
   }),
 });
+
+export const updateOutageStatusSchema = z.object({
+  status: z.enum(["IN_PROGRESS", "RESOLVED"]),
+  note: z.string().trim().max(500, "Note cannot exceed 500 characters"),
+});

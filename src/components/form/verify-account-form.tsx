@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation */
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";

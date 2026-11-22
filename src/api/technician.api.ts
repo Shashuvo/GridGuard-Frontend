@@ -1,5 +1,5 @@
 import apiClient from "@/lib/apiClient";
-import type { TechnicianApplicationPayload, VerifyAccountPayload } from "@/types";
+import type { TechnicianApplicationPayload, UpdateOutageStatusPayload, VerifyAccountPayload } from "@/types";
 
 export function applyAsTechnician(
   payload: TechnicianApplicationPayload,
@@ -22,4 +22,15 @@ export function verifyTechnicianAccount(
       method: "POST",
       body: payload,
     });
+}
+
+export function getOutageDetails(id: string) {
+  return apiClient(`/unexpected-outage/${id}`);
+}
+
+export function updateOutageStatus(id: string, payload: UpdateOutageStatusPayload) {
+  return apiClient(`/technician/${id}/update-status`, {
+    method: "PATCH",
+    body: payload,
+  });
 }

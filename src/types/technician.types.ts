@@ -15,3 +15,8 @@ export interface TechnicianApplicationPayload {
   resume: File;
   data: TechnicianApplicationData;
 }
+
+export interface UpdateOutageStatusPayload {
+  status: "IN_PROGRESS" | "RESOLVED";
+  note?: string;
+}
