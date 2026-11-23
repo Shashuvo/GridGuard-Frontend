@@ -215,7 +215,7 @@ export default function UnexpectedOutagesAdminTable({
                 </dl>
 
                 <p className="text-xs text-muted-foreground">
-                  Reported {format(new Date(outage.createdAt), "dd MMM yyyy")}
+                  Reported {format(new Date(outage.createdAt), "dd MMM yyyy, hh:mm a")}
                 </p>
 
                 <div className="border-t pt-3">
@@ -295,8 +295,14 @@ export default function UnexpectedOutagesAdminTable({
                     )}
                   </TableCell>
 
-                  <TableCell className={`${cellClass} text-sm whitespace-nowrap text-muted-foreground`}>
-                    {format(new Date(outage.createdAt), "dd MMM yyyy")}
+                  {/* Date, with the time underneath (same as the scheduled tables) */}
+                  <TableCell className={`${cellClass} whitespace-nowrap`}>
+                    <span className="block text-sm">
+                      {format(new Date(outage.createdAt), "dd MMM yyyy")}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {format(new Date(outage.createdAt), "hh:mm a")}
+                    </span>
                   </TableCell>
 
                   <TableCell className={`${cellClass} whitespace-nowrap`}>

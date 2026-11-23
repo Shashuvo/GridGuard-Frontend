@@ -17,4 +17,22 @@ export interface ICustomerAnalytics {
       totalAmountSpent: number;
       totalPaidPayments: number;
     };
-  }
+}
+
+export interface ITechnicianAnalytics {
+  unexpectedOutages: {
+    total: number;
+    assigned: number;
+    inProgress: number;
+    resolved: number;
+  };
+  scheduledOutages: {
+    total: number;
+    upcoming: number;
+    ongoing: number;
+    completed: number;
+  };
+  totalAssignments: number;
+  pendingAssignments: number;
+  resolvedAssignments: number;
+}

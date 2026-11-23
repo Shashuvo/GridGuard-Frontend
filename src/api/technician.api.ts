@@ -1,5 +1,6 @@
+// technician.api.ts
 import apiClient from "@/lib/apiClient";
-import type { TechnicianApplicationPayload, UpdateOutageStatusPayload, VerifyAccountPayload } from "@/types";
+import type { IApiResponse, IAssignmentsResponse, TechnicianApplicationPayload, UpdateOutageStatusPayload, UpdateTechnicianProfilePayload, VerifyAccountPayload } from "@/types";
 
 export function applyAsTechnician(
   payload: TechnicianApplicationPayload,
@@ -13,15 +14,28 @@ export function applyAsTechnician(
     method: "POST",
     body: formData,
   });
-};
+}
 
 export function verifyTechnicianAccount(
-    payload: VerifyAccountPayload,
-  ){
-    return apiClient("/technician/apply-as-technician/verify-email", {
-      method: "POST",
-      body: payload,
-    });
+  payload: VerifyAccountPayload,
+) {
+  return apiClient("/technician/apply-as-technician/verify-email", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export function updateTechnicianProfile(payload : UpdateTechnicianProfilePayload) {
+  return apiClient("/technician/update-my-profile", { method: "PATCH", body: payload });
+}
+
+export function getMyAssignments(params?: {
+  page?: number;
+  limit?: number;
+}) {
+  return apiClient<IApiResponse<IAssignmentsResponse>>("/technician/my-assignments", {
+    query: params,
+  });
 }
 
 export function getOutageDetails(id: string) {

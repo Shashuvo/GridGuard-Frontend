@@ -1,4 +1,11 @@
-import { applyAsTechnician, getOutageDetails, updateOutageStatus, verifyTechnicianAccount } from "@/api";
+import {
+  applyAsTechnician,
+  getMyAssignments,
+  getOutageDetails,
+  updateOutageStatus,
+  updateTechnicianProfile,
+  verifyTechnicianAccount,
+} from "@/api";
 import type { UpdateOutageStatusPayload } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -9,10 +16,22 @@ export function useApplyAsTechnician() {
 }
 
 export function useVerifyTechnicianAccount() {
-    return useMutation({
-      mutationFn: verifyTechnicianAccount,
-    });
-} 
+  return useMutation({
+    mutationFn: verifyTechnicianAccount,
+  });
+}
+
+export function useUpdateTechnicianProfile() {
+  return useMutation({ mutationFn: updateTechnicianProfile });
+}
+
+
+export function useGetMyAssignments(params?: { page?: number; limit?: number }) {
+  return useQuery({
+    queryKey: ["my-assignments", params],
+    queryFn: () => getMyAssignments(params),
+  });
+}
 
 export function useGetOutageDetails(id: string) {
   return useQuery({

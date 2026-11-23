@@ -1,4 +1,4 @@
-import { getCustomerAnalytics } from "@/api";
+import { getCustomerAnalytics, getTechnicianAnalytics } from "@/api";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetCustomerAnalytics() {
@@ -8,3 +8,9 @@ export function useGetCustomerAnalytics() {
     });
 };
 
+export function useGetTechnicianAnalytics() {
+  return useQuery({
+    queryKey: ["technician-analytics"],
+    queryFn: getTechnicianAnalytics,
+  });
+}
