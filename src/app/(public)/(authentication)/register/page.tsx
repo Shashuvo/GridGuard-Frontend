@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Check } from "lucide-react"
+import { Check, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoMark } from "@/components/layout/public/LogoMark"
 import { RegisterForm } from "@/components/form/register-form"
@@ -101,7 +101,10 @@ export default function RegisterPage() {
             variant="outline"
             className="rounded-full bg-background/70 px-5 backdrop-blur"
           >
-            <Link href="/login">Login</Link>
+            <Link href="/">
+              <Home className="size-4" aria-hidden />
+              Back to Home
+            </Link>
           </Button>
         </div>
 

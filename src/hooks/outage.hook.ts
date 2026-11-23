@@ -1,11 +1,16 @@
-import { getMyReports, reportOutage } from "@/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  getMyReports,
+  getPublicOutagesByArea,
+  getPublicScheduledOutagesByArea,
+  reportOutage,
+} from "@/api";
 
 export function useReportOutage() {
-    return useMutation({
-      mutationFn: reportOutage,
-    });
-};
+  return useMutation({
+    mutationFn: reportOutage,
+  });
+}
 
 export function useGetMyReports(params?: {
   page?: number;
@@ -17,4 +22,30 @@ export function useGetMyReports(params?: {
     queryKey: ["my-reports", params],
     queryFn: () => getMyReports(params),
   });
-};
+}
+
+export function useGetPublicOutagesByArea(
+  areaId?: string,
+  params?: { page?: number; limit?: number },
+) {
+  return useQuery({
+    queryKey: ["unexpected-outages-by-area", areaId, params],
+    queryFn: () => getPublicOutagesByArea(areaId as string, params),
+    enabled: !!areaId,
+    staleTime: 10_000,
+    refetchInterval: 15_000,
+  });
+}
+
+export function useGetPublicScheduledOutagesByArea(
+  areaId?: string,
+  params?: { page?: number; limit?: number },
+) {
+  return useQuery({
+    queryKey: ["scheduled-outages-by-area", areaId, params],
+    queryFn: () => getPublicScheduledOutagesByArea(areaId as string, params),
+    enabled: !!areaId,
+    staleTime: 10_000,
+    refetchInterval: 60_000,
+  });
+}

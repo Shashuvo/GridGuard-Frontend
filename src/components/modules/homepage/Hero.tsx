@@ -1,7 +1,11 @@
+import { AlertTriangle, CalendarClock, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, CalendarClock, Wrench, Zap } from "lucide-react";
+import { Suspense } from "react";
 
+import LiveOutageCard, {
+  LiveOutageCardFallback,
+} from "@/components/shared/live-outage-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -118,23 +122,11 @@ export default function HeroSection() {
               />
             </div>
 
-            {/* Sample status card. Static example, not real data. */}
-            <div
-              aria-hidden
-              className="absolute -bottom-6 -left-6 w-64 rounded-2xl border bg-background/80 p-4 shadow-xl backdrop-blur-md"
-            >
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Wrench className="size-4 text-muted-foreground" />
-                Outage on Station Road
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-1.5">
-                <span className="h-1.5 rounded-full bg-primary" />
-                <span className="h-1.5 rounded-full bg-primary" />
-                <span className="h-1.5 rounded-full bg-muted" />
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Technician on the way
-              </p>
+            {/* Live status card */}
+            <div className="absolute -bottom-30 -left-10 w-100">
+              <Suspense fallback={<LiveOutageCardFallback variant="light" />}>
+                <LiveOutageCard variant="light" />
+              </Suspense>
             </div>
           </div>
         </div>

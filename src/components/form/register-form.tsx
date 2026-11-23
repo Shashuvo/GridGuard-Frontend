@@ -116,11 +116,11 @@ export function RegisterForm() {
     type CustomerDefaultValues = z.infer<typeof customerRegistrationSchema>;
 
     const defaultValues: CustomerDefaultValues = {
-        name: "Mir",
-        email: "mir@gmail.com",
-        contactNumber: "01912345678",
-        password: "@User123456",
-        confirmPassword: "@User123456",
+        name: "",
+        email: "",
+        contactNumber: "",
+        password: "",
+        confirmPassword: "",
     };
 
     const { mutate: registration, isPending: registrationPending } =
@@ -297,6 +297,7 @@ export function RegisterForm() {
                                             onChange={(e) => field.handleChange(e.target.value)}
                                             aria-invalid={isInvalid}
                                             autoComplete="new-password"
+                                            placeholder="At least 8 characters"
                                         />
                                         <PasswordStrength value={field.state.value} />
                                         {isInvalid && (
@@ -325,6 +326,7 @@ export function RegisterForm() {
                                             onChange={(e) => field.handleChange(e.target.value)}
                                             aria-invalid={isInvalid}
                                             autoComplete="new-password"
+                                            placeholder="Re-enter your password"
                                         />
                                         {isInvalid && (
                                             <FieldError errors={field.state.meta.errors} />

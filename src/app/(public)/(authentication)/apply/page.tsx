@@ -1,3 +1,4 @@
+import { Home } from "lucide-react";
 import Link from "next/link";
 
 import TechnicianApplyForm from "@/components/form/technician-apply-form";
@@ -55,7 +56,10 @@ export default function ApplyPage() {
             variant="outline"
             className="h-10 rounded-full bg-background/70 px-4 backdrop-blur sm:px-5"
           >
-            <Link href="/login">Login</Link>
+            <Link href="/">
+              <Home className="size-4" aria-hidden />
+              Back to Home
+            </Link>
           </Button>
         </div>
 

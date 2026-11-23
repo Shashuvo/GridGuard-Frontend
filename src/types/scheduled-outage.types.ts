@@ -1,7 +1,11 @@
 /** biome-ignore-all lint/style/useImportType: <explanation */
 import { IArea } from "./area.types";
 
-export type ScheduledOutageStatus = "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
+export type ScheduledOutageStatus =
+  | "UPCOMING"
+  | "ONGOING"
+  | "COMPLETED"
+  | "CANCELLED";
 
 export interface IScheduledOutage {
   id: string;
@@ -13,6 +17,15 @@ export interface IScheduledOutage {
   technicianId: string;
   createdAt: string;
   updatedAt: string;
+  area: IArea;
+}
+
+export interface IPublicScheduledOutage {
+  id: string;
+  reason: string;
+  startTime: string;
+  endTime: string;
+  status: ScheduledOutageStatus;
   area: IArea;
 }
 

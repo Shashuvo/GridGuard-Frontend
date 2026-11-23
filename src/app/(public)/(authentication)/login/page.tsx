@@ -1,8 +1,13 @@
-import Link from "next/link"
+import { Home } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 
-import LoginForm from "@/components/form/login-form"
-import { Button } from "@/components/ui/button"
-import { LogoMark } from "@/components/layout/public/LogoMark"
+import LoginForm from "@/components/form/login-form";
+import { LogoMark } from "@/components/layout/public/LogoMark";
+import LiveOutageCard, {
+  LiveOutageCardFallback,
+} from "@/components/shared/live-outage-card";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   return (
@@ -50,7 +55,10 @@ export default function LoginPage() {
             variant="outline"
             className="h-10 rounded-full bg-background/70 px-4 backdrop-blur sm:px-5"
           >
-            <Link href="/register">Register</Link>
+            <Link href="/">
+              <Home className="size-4" aria-hidden />
+              Back to Home
+            </Link>
           </Button>
         </div>
 
@@ -99,8 +107,13 @@ export default function LoginPage() {
           <p className="max-w-md font-serif text-4xl leading-tight">
             Know when the power goes, and when it&apos;s coming back.
           </p>
+
+          {/* Live status card */}
+          <Suspense fallback={<LiveOutageCardFallback variant="dark" />}>
+            <LiveOutageCard variant="dark" />
+          </Suspense>
         </div>
       </div>
     </div>
-  )
+  );
 }

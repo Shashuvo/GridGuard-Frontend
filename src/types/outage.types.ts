@@ -34,6 +34,14 @@ export interface IUnexpectedOutage {
   reporter?: IReporter;
 }
 
+export interface IPublicOutage {
+  id: string;
+  description: string;
+  status: OutageStatus;
+  createdAt: string;
+  area: IArea;
+}
+
 export interface ReportOutagePayload {
   areaId: string;
   description: string;

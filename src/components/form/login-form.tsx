@@ -90,8 +90,8 @@ export default function LoginForm({
 
   const form = useForm({
     defaultValues: {
-      email: "admin@gridguard.com",
-      password: "GridGuard@TestAdmin2026!",
+      email: "",
+      password: "",
     },
     validators: {
       onSubmit: loginSchema,
@@ -245,6 +245,7 @@ export default function LoginForm({
                     name={field.name}
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
+                    placeholder="Enter your password"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onKeyDown={(e) =>
