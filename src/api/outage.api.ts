@@ -32,9 +32,21 @@ export function getPublicOutagesByArea(
   );
 }
 
+export function getPublicScheduledOutages(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  areaId?: string;
+}) {
+  return apiClient<IApiResponse<IPublicScheduledOutage[]>>(
+    "/scheduled-outage/public/all",
+    { query: params },
+  );
+}
+
 export function getPublicScheduledOutagesByArea(
   areaId: string,
-  params?: { page?: number; limit?: number },
+  params?: { page?: number; limit?: number; status?: string },
 ) {
   return apiClient<IApiResponse<IPublicScheduledOutage[]>>(
     `/scheduled-outage/public/area/${areaId}`,

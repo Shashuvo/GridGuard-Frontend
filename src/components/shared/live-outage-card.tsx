@@ -10,7 +10,7 @@ import {
 import {
   useGetPublicAreas,
   useGetPublicOutagesByArea,
-  useGetPublicScheduledOutagesByArea,
+  useGetPublicScheduledOutages,
 } from "@/hooks";
 import { cn } from "@/lib/utils";
 
@@ -134,7 +134,7 @@ export default function LiveOutageCard({
     data: scheduledData,
     isPending: scheduledPending,
     isError: scheduledError,
-  } = useGetPublicScheduledOutagesByArea(areaId, { limit: 1 });
+  } = useGetPublicScheduledOutages({ limit: 1 });
 
   const outage = outagesData?.data?.[0];
   const scheduledOutage = scheduledData?.data?.[0];
@@ -143,7 +143,7 @@ export default function LiveOutageCard({
     ? scheduledOutageStatus[scheduledOutage.status]
     : null;
   const loading =
-    areasPending || (!!areaId && (outagesPending || scheduledPending));
+    areasPending || scheduledPending || (!!areaId && outagesPending);
   const unavailable = areasError || outagesError;
   const scheduledTotal = scheduledData?.meta?.total ?? 0;
 

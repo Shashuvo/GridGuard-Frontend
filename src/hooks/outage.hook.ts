@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getMyReports,
   getPublicOutagesByArea,
+  getPublicScheduledOutages,
   getPublicScheduledOutagesByArea,
   reportOutage,
 } from "@/api";
@@ -37,9 +38,27 @@ export function useGetPublicOutagesByArea(
   });
 }
 
+export function useGetPublicScheduledOutages(
+  params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    areaId?: string;
+  },
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ["scheduled-outages", params],
+    queryFn: () => getPublicScheduledOutages(params),
+    enabled,
+    staleTime: 10_000,
+    refetchInterval: 60_000,
+  });
+}
+
 export function useGetPublicScheduledOutagesByArea(
   areaId?: string,
-  params?: { page?: number; limit?: number },
+  params?: { page?: number; limit?: number; status?: string },
 ) {
   return useQuery({
     queryKey: ["scheduled-outages-by-area", areaId, params],
