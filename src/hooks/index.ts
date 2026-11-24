@@ -6,3 +6,4 @@ export * from "./payment.hook";
 export * from "./analytics.hook";
 export * from "./outage.hook";
 export * from "./admin.hook";
+export * from "./user.hook";

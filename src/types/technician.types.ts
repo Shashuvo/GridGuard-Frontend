@@ -58,3 +58,4 @@ export interface ITechnicianProfile {
   bio?: string;
   address?: string;
 }
+

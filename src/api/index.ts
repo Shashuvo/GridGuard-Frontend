@@ -6,3 +6,4 @@ export * from "./analytics.api";
 export * from "./outage.api";
 export * from "./admin.api";
 export * from "./package.api";
+export * from "./user.api";

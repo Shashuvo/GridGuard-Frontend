@@ -55,9 +55,8 @@ export function UserMenu({ redirectTo }: { redirectTo?: string }) {
     if (!user) return null
 
     const role = user.role as UserRole
-    // Change "photoUrl" if your user object calls the picture something else.
-    const photo =
-        (user as { photoUrl?: string | null }).photoUrl || undefined
+    // The profile picture is stored as imageUrl (the same field the profile page uses)
+    const photo = user.imageUrl || undefined
     const initials = getInitials(user.name, user.email)
 
     return (

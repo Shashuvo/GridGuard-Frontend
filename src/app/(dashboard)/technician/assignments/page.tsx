@@ -13,8 +13,10 @@ import OutageDetailModal from "@/components/modules/technician/outage-detail-mod
 // Separate pill tabs with no grey bar behind them, so there is no grey space around the buttons.
 // The active tab is amber; the inactive one is a light outlined pill. Both selectors are listed, so the
 // active style works whichever way the Tabs component marks it.
+// On phones the two tabs share the row in a two-column grid and use tighter padding and text,
+// so the label and count always fit inside the box. From sm up they size to their content.
 const tabTriggerClass =
-  "h-11 flex-1 gap-2 rounded-full border border-border bg-background/60 px-4 text-sm font-medium text-muted-foreground shadow-none outline-none after:hidden sm:flex-none " +
+  "h-11 w-full min-w-0 flex-none gap-1.5 rounded-full border border-border bg-background/60 px-2.5 text-[13px] font-medium whitespace-nowrap text-muted-foreground shadow-none outline-none after:hidden sm:w-auto sm:gap-2 sm:px-5 sm:text-sm " +
   "transition-colors hover:bg-primary/10 hover:text-foreground " +
   // No grey outline when a tab is clicked or focused, and no glow around the active pill
   "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 " +
@@ -23,7 +25,7 @@ const tabTriggerClass =
 
 function CountChip({ value }: { value: number }) {
   return (
-    <span className="rounded-full bg-background/70 px-2 py-0.5 text-xs font-semibold text-foreground">
+    <span className="shrink-0 rounded-full bg-background/70 px-2 py-0.5 text-xs font-semibold text-foreground">
       {value}
     </span>
   );
@@ -77,14 +79,15 @@ export default function AssignmentsPage() {
           className="rounded-3xl border bg-card/80 p-4 shadow-xl shadow-black/5 backdrop-blur sm:p-6"
         >
           <Tabs defaultValue="unexpected" className="gap-4">
-            <TabsList className="h-auto w-full justify-start gap-2 rounded-none bg-transparent p-0 sm:w-fit">
+            {/* Two equal columns on phones, side by side at their natural size from sm */}
+            <TabsList className="grid h-auto w-full grid-cols-2 justify-start gap-2 rounded-none bg-transparent p-0 sm:flex sm:w-fit">
               <TabsTrigger value="unexpected" className={tabTriggerClass}>
-                <Zap className="size-4" aria-hidden="true" />
+                <Zap className="size-3.5 shrink-0 sm:size-4" aria-hidden="true" />
                 Unexpected
                 <CountChip value={meta?.unexpectedTotal ?? 0} />
               </TabsTrigger>
               <TabsTrigger value="scheduled" className={tabTriggerClass}>
-                <CalendarClock className="size-4" aria-hidden="true" />
+                <CalendarClock className="size-3.5 shrink-0 sm:size-4" aria-hidden="true" />
                 Scheduled
                 <CountChip value={meta?.scheduledTotal ?? 0} />
               </TabsTrigger>
