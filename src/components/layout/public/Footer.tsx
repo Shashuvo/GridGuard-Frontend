@@ -125,7 +125,7 @@ function SocialLinks() {
               rel="noopener noreferrer"
               aria-label={`Visit my ${label} profile`}
               title={label}
-              className="flex size-9 items-center justify-center rounded-full border border-background/15 bg-background/[0.04] text-background/60 motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none"
+              className="flex size-9 items-center justify-center rounded-full border border-background/15 bg-background/4 text-background/60 motion-safe:transition-all motion-safe:duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none"
             >
               <Icon aria-hidden="true" className="size-3.5" />
             </Link>
@@ -182,7 +182,7 @@ export function Footer() {
             </span>
           </Link>
 
-          <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-background/10 bg-background/[0.04] px-3.5 py-1.5 text-[10px] font-medium tracking-wide text-background/60">
+          <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-background/10 bg-background/4 px-3.5 py-1.5 text-[10px] font-medium tracking-wide text-background/60">
             <Zap
               aria-hidden="true"
               className="size-3 text-primary"
@@ -208,7 +208,7 @@ export function Footer() {
         </div>
 
         {/* Navigation area */}
-        <div className="border-t border-background/10 border-b border-background/10 py-10 sm:py-12">
+        <div className="border-t border-b border-background/10 py-10 sm:py-12">
           <div className="mx-auto grid max-w-3xl grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 sm:gap-8">
 
             <FooterColumn
