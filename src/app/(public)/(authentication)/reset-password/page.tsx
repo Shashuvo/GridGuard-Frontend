@@ -1,134 +1,159 @@
-// import Link from "next/link";
-// import { Suspense } from "react";
-// import { CircleCheck } from "lucide-react";
+import { Check } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 
-// import ResetPasswordForm from "@/components/form/reset-password-form";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import { LogoMark } from "@/components/layout/public/LogoMark";
+import ResetPasswordForm from "@/components/form/reset-password-form";
+import { LogoMark } from "@/components/layout/public/LogoMark";
+import { Button } from "@/components/ui/button";
 
-// // The year is hardcoded: Cache Components does not allow new Date() in a server component
-// const YEAR = 2026;
+const YEAR = 2026;
 
-// function FormSkeleton() {
-//   return (
-//     // biome-ignore lint/a11y/useSemanticElements: <explanation
-// <div role="status" aria-label="Loading form" className="flex flex-col gap-5">
-//       <Skeleton className="h-8 w-48 rounded-full" />
-//       <Skeleton className="h-11 w-full rounded-full" />
-//       <Skeleton className="h-11 w-full rounded-full" />
-//       <Skeleton className="h-12 w-full rounded-full" />
-//     </div>
-//   );
-// }
+const steps = [
+  { label: "Request a code", state: "done" },
+  { label: "Choose password", state: "current" },
+  { label: "Log in", state: "upcoming" },
+] as const;
 
-// export default function ResetPasswordPage() {
-//   return (
-//     <div className="grid min-h-svh lg:h-svh lg:grid-cols-2 lg:overflow-hidden">
-//       {/* Left: form */}
-//       <div className="relative isolate flex flex-col overflow-hidden">
-//         {/* Dotted background, faded at the edges */}
-//         <div
-//           aria-hidden="true"
-//           className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-size-[22px_22px] mask-[radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
-//         />
-//         {/* Neutral glow */}
-//         <div
-//           aria-hidden="true"
-//           className="pointer-events-none absolute -top-24 left-1/2 -z-10 size-72 -translate-x-1/2 rounded-full bg-muted-foreground/15 blur-3xl sm:size-96"
-//         />
+export default function ResetPasswordPage() {
+  return (
+    <div className="grid min-h-svh lg:h-svh lg:grid-cols-2 lg:overflow-hidden">
+      <div className="relative isolate flex min-h-0 flex-col gap-4 overflow-x-hidden p-6 md:p-8 lg:overflow-y-auto">
+        <div
+          aria-hidden
+          className="absolute -top-40 -left-40 -z-10 size-112 rounded-full bg-muted-foreground/15 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 text-foreground opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, currentColor 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+            maskImage:
+              "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+          }}
+        />
 
-//         {/* Top bar: logo left, back to login right */}
-//         <div className="flex items-center justify-between gap-4 p-4 sm:p-6 md:p-8">
-//           <Link
-//             href="/"
-//             aria-label="GridGuard home"
-//             className="group flex items-center gap-2.5 text-lg font-semibold"
-//           >
-//             <LogoMark className="size-10 drop-shadow-sm transition-transform duration-200 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
-//             <span className="font-serif text-xl tracking-tight">
-//               Grid
-//               <span className="text-primary-foreground dark:text-primary">Guard</span>
-//             </span>
-//           </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            aria-label="GridGuard home"
+            className="group flex items-center gap-2.5 text-lg font-semibold"
+          >
+            <LogoMark className="size-10 drop-shadow-sm transition-transform duration-200 group-hover:scale-105" />
+            <span className="font-serif text-xl tracking-tight">
+              Grid
+              <span className="text-primary-foreground dark:text-primary">
+                Guard
+              </span>
+            </span>
+          </Link>
 
-//           <Link
-//             href="/login"
-//             className="inline-flex h-10 items-center justify-center rounded-full border border-border bg-background/60 px-5 text-sm font-medium hover:bg-primary/10 focus-visible:ring-4 focus-visible:ring-primary/25 focus-visible:outline-none motion-safe:transition-colors"
-//           >
-//             Back to login
-//           </Link>
-//         </div>
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full bg-background/70 px-5 backdrop-blur"
+          >
+            <Link href="/login">Login</Link>
+          </Button>
+        </div>
 
-//         {/* Form card */}
-//         <div className="flex flex-1 items-center justify-center p-4 sm:p-6 md:p-8">
-//           <div className="w-full max-w-md rounded-3xl border bg-card/80 p-6 shadow-xl shadow-black/5 backdrop-blur sm:p-8 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500 motion-reduce:animate-none">
-//             <Suspense fallback={<FormSkeleton />}>
-//               <ResetPasswordForm />
-//             </Suspense>
-//           </div>
-//         </div>
+        <div className="flex flex-1 items-center justify-center py-2">
+          <div className="w-full max-w-md rounded-3xl border bg-card/80 p-6 shadow-xl shadow-black/5 backdrop-blur motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500 sm:p-8">
+            <Suspense
+              fallback={
+                // biome-ignore lint/a11y/useSemanticElements: status role on loading placeholder
+                <div
+                  role="status"
+                  aria-label="Loading"
+                  className="h-120 rounded-2xl bg-muted/60 motion-safe:animate-pulse"
+                />
+              }
+            >
+              <ResetPasswordForm />
+            </Suspense>
+          </div>
+        </div>
 
-//         {/* Footer */}
-//         <div className="flex flex-col items-center justify-between gap-2 p-4 text-xs text-muted-foreground sm:flex-row sm:p-6 md:px-8">
-//           <p>© {YEAR} GridGuard. All rights reserved.</p>
-//           <nav aria-label="Legal" className="flex items-center gap-4">
-//             <Link
-//               href="/terms"
-//               className="rounded-full underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-4 focus-visible:ring-primary/25 focus-visible:outline-none"
-//             >
-//               Terms
-//             </Link>
-//             <Link
-//               href="/privacy"
-//               className="rounded-full underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-4 focus-visible:ring-primary/25 focus-visible:outline-none"
-//             >
-//               Privacy
-//             </Link>
-//           </nav>
-//         </div>
-//       </div>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <p>© {YEAR} GridGuard</p>
+          <nav aria-label="Legal" className="flex gap-4">
+            <Link href="/terms" className="hover:text-foreground">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy
+            </Link>
+          </nav>
+        </div>
+      </div>
 
-//       {/* Right: photo, only on large screens */}
-//       <div
-//         aria-hidden="true"
-//         className="relative isolate hidden overflow-hidden bg-muted bg-cover bg-center lg:block"
-//         style={{ backgroundImage: "url('/login.jpg')" }}
-//       >
-//         {/* Dark gradient so the text stays readable */}
-//         <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/35 to-black/45" />
+      <div className="relative hidden overflow-hidden bg-neutral-950 text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center dark:brightness-75"
+          style={{ backgroundImage: "url('/register.jpg')" }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-b from-black/45 via-black/10 to-black/80"
+        />
 
-//         <div className="relative flex h-full flex-col justify-between p-10 xl:p-12">
-//           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-//             <span className="relative flex size-2">
-//               <span className="absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />
-//               <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
-//             </span>
-//             Updates in real time
-//           </span>
+        <div className="relative flex w-fit items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3.5 py-1.5 text-sm text-white/90 backdrop-blur-sm">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex size-full rounded-full bg-primary opacity-60 motion-safe:animate-ping" />
+            <span className="relative inline-flex size-2 rounded-full bg-primary" />
+          </span>
+          Password recovery
+        </div>
 
-//           <div className="flex flex-col gap-6">
-//             {/* Sample status card (decoration only) */}
-//             <div className="flex w-fit items-center gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 text-white shadow-xl backdrop-blur-md">
-//               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/25 text-emerald-300">
-//                 <CircleCheck className="size-5" />
-//               </span>
-//               <div className="flex flex-col">
-//                 <span className="text-sm font-semibold">Power restored</span>
-//                 <span className="text-xs text-white/70">Mirpur-10 · 12 minutes ago</span>
-//               </div>
-//             </div>
+        <div className="relative flex flex-col gap-8">
+          <p className="max-w-md font-serif text-4xl leading-tight">
+            A fresh password, back to business.
+          </p>
 
-//             <div className="flex max-w-md flex-col gap-2">
-//               <p className="font-serif text-4xl leading-tight font-semibold tracking-tight text-white">
-//                 Stay ahead of every outage.
-//               </p>
-//               <p className="text-base text-white/75">
-//                 Reports, repairs and planned outages, all in one place.
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+          <ol
+            aria-label="Password reset progress"
+            className="grid max-w-md grid-cols-3 gap-3 rounded-2xl border border-white/15 bg-black/35 p-5 backdrop-blur-md"
+          >
+            {steps.map((step) => (
+              <li
+                key={step.label}
+                aria-current={step.state === "current" ? "step" : undefined}
+                className="flex flex-col gap-2"
+              >
+                <span
+                  className={
+                    step.state === "done"
+                      ? "flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                      : step.state === "current"
+                        ? "flex size-6 items-center justify-center rounded-full border-2 border-primary"
+                        : "flex size-6 items-center justify-center rounded-full border border-white/25"
+                  }
+                >
+                  {step.state === "done" && (
+                    <Check className="size-3.5" aria-hidden />
+                  )}
+                  {step.state === "current" && (
+                    <span className="size-2 rounded-full bg-primary motion-safe:animate-pulse" />
+                  )}
+                </span>
+                <span
+                  className={
+                    step.state === "upcoming"
+                      ? "text-sm text-white/50"
+                      : "text-sm text-white"
+                  }
+                >
+                  {step.label}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </div>
+  );
+}

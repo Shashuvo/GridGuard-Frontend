@@ -120,7 +120,7 @@ export default function TechnicianApplyForm() {
                         }
 
                         toast.success("Application Submitted.",{
-                            description: "Please verify your account",
+                            description: "Please verify your email to continue your application",
                             position: "top-right"
                         });
 

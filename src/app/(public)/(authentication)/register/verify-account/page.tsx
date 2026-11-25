@@ -20,7 +20,7 @@ export default function VerifyAccountPage() {
         {/* soft glow */}
         <div
           aria-hidden
-          className="absolute -top-40 -left-40 -z-10 size-[28rem] rounded-full bg-muted-foreground/15 blur-3xl"
+          className="absolute -top-40 -left-40 -z-10 size-112 rounded-full bg-muted-foreground/15 blur-3xl"
         />
         {/* faint dot grid, fading out toward the edges */}
         <div
@@ -66,7 +66,7 @@ export default function VerifyAccountPage() {
             {/* useSearchParams in the form needs a Suspense boundary */}
             <Suspense
               fallback={
-                // biome-ignore lint/a11y/useSemanticElements: <explanation>
+                // biome-ignore lint/a11y/useSemanticElements: <explanation
 <div
                   role="status"
                   aria-label="Loading"

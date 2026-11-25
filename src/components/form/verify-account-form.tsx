@@ -78,7 +78,7 @@ export default function VerifyAccountForm({
           }
 
           if (mode === "technician") {
-            toast.success("Verification Successful.",{
+            toast.success("Application verified.",{
                 description:"An admin will review your application. Please check your email in a few days.",
                 position: "top-right"
             });
@@ -112,11 +112,11 @@ export default function VerifyAccountForm({
         </span>
         <div className="flex flex-col gap-2">
           <h1 className="font-serif text-3xl font-bold tracking-tight">
-            Verify your email
+            {mode === "technician" ? "Verify your application" : "Verify your email"}
           </h1>
           <p className="text-balance text-[15px] leading-relaxed text-muted-foreground">
             {mode === "technician"
-              ? "Verify your email to complete your technician application. We sent a 6-digit code to "
+              ? "Confirm your email to finish submitting your technician application. We sent a 6-digit code to "
               : "We sent a 6-digit code to "}
             <span className="font-medium break-all text-foreground">{email}</span>
             .
@@ -175,7 +175,7 @@ export default function VerifyAccountForm({
               <Spinner /> Verifying
             </>
           ) : (
-            "Verify account"
+            mode === "technician" ? "Verify application" : "Verify account"
           )}
         </Button>
       </form>
@@ -200,7 +200,7 @@ export default function VerifyAccountForm({
             href={mode === "technician" ? "/apply" : "/register"}
             className="font-medium text-foreground underline underline-offset-4"
           >
-            Go back
+            {mode === "technician" ? "Back to application" : "Go back"}
           </Link>
         </p>
       </div>

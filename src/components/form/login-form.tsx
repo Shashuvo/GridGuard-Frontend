@@ -28,8 +28,9 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useLogin } from "@/hooks"
+import { useForgotPassword, useLogin } from "@/hooks"
 import { type DemoAccount, type DemoRole, demoAccounts } from "@/lib/demo-accounts"
+import { getErrorMessage } from "@/lib/getErrorMessage"
 import { cn } from "@/lib/utils"
 import type { LoginPayload } from "@/types"
 import { loginSchema } from "@/validation"
@@ -56,6 +57,10 @@ export default function LoginForm({
     mutate: login,
     isPending: loginPending,
   } = useLogin();
+  const {
+    mutate: sendForgotPassword,
+    isPending: forgotPasswordPending,
+  } = useForgotPassword();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -100,6 +105,49 @@ export default function LoginForm({
       loginWithCredentials({ email: value.email, password: value.password });
     },
   });
+
+  const handleForgotPassword = () => {
+    const validation = loginSchema.shape.email.safeParse(
+      form.getFieldValue("email"),
+    );
+
+    if (!validation.success) {
+      toast.error("Enter your email address.", {
+        description: "Provide a valid email to receive a password reset code.",
+        position: "top-right",
+      });
+      return;
+    }
+
+    const email = validation.data;
+
+    sendForgotPassword(
+      { email },
+      {
+        onSuccess: (res) => {
+          if (!res.success) {
+            toast.error("Could not send reset code.", {
+              description: "Please try again later.",
+              position: "top-right",
+            });
+            return;
+          }
+
+          toast.success("Reset code sent.", {
+            description: `We sent a 6-digit code to ${email}.`,
+            position: "top-right",
+          });
+          router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+        },
+        onError: (err) => {
+          toast.error("Could not send reset code.", {
+            description: getErrorMessage(err),
+            position: "top-right",
+          });
+        },
+      },
+    );
+  };
 
   const handleDemoLogin = (account: DemoAccount) => {
     setDemoRole(account.role);
@@ -228,12 +276,21 @@ export default function LoginForm({
               <Field data-invalid={invalid}>
                 <div className="flex items-center">
                   <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                  <Link
-                    href="/forgot-password"
-                    className="ml-auto text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={forgotPasswordPending || loginPending}
+                    aria-busy={forgotPasswordPending}
+                    className="ml-auto inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Forgot password?
-                  </Link>
+                    {forgotPasswordPending && (
+                      <Loader2
+                        className="size-3.5 animate-spin"
+                        aria-hidden
+                      />
+                    )}
+                    {forgotPasswordPending ? "Sending" : "Forgot password?"}
+                  </button>
                 </div>
                 <div className="relative">
                   <Lock
