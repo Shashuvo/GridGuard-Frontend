@@ -7,10 +7,12 @@ import {
   isTomorrow,
 } from "date-fns";
 import {
+  Activity,
   ArrowRight,
   BellRing,
   CalendarClock,
   Check,
+  Clock,
   MapPin,
   TriangleAlert,
 } from "lucide-react";
@@ -21,7 +23,7 @@ import {
   OutageStatusChip,
 } from "@/components/modules/admin/scheduled-outage-ui";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import TablePagination from "@/components/ui/table-pagination";
 import { useGetPublicScheduledOutages } from "@/hooks";
@@ -41,6 +43,8 @@ const filters = [
 const alertPoints = ["Email alerts", "Planned outages", "Your area"];
 
 const amberText = "text-primary-foreground dark:text-primary";
+const labelClass =
+  "text-[11px] font-semibold tracking-wider text-muted-foreground uppercase";
 
 export default function SchedulesPage() {
   const [page, setPage] = useState(1);
@@ -117,7 +121,7 @@ export default function SchedulesPage() {
           </div>
 
           {/* Status filter: pill bar like the navbar, scrolls inside itself on phones */}
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-3">
             {/* biome-ignore lint/a11y/useSemanticElements: group of toggle buttons, not a form fieldset */}
             <div
               role="group"
@@ -144,6 +148,20 @@ export default function SchedulesPage() {
                 );
               })}
             </div>
+
+            {meta && !isLoading && !isError && (
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-semibold text-foreground">
+                  {outages.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-foreground">
+                  {meta.total}
+                </span>{" "}
+                {meta.total === 1 ? "outage" : "outages"}
+              </p>
+            )}
           </div>
 
           {/* List */}
@@ -170,72 +188,58 @@ export default function SchedulesPage() {
               ))}
             </div>
           ) : isError ? (
-            <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed bg-card/60 px-4 py-14 text-center backdrop-blur sm:py-16">
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "flex size-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10",
-                  amberText,
-                )}
-              >
-                <TriangleAlert className="size-6" />
-              </span>
-              <div>
-                <p className="font-serif text-2xl font-semibold tracking-tight">
-                  Could not load schedules
-                </p>
-                <p className="mx-auto mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                  Something went wrong while loading. Please try again.
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => refetch()}
-                className="h-11 rounded-full bg-background px-6 transition-colors hover:bg-primary/15 motion-reduce:transition-none"
-              >
-                Try again
-              </Button>
-            </div>
-          ) : outages.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed bg-card/60 px-4 py-14 text-center backdrop-blur sm:py-16">
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "flex size-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10",
-                  amberText,
-                )}
-              >
-                <CalendarClock className="size-6" />
-              </span>
-              <div>
-                <p className="font-serif text-2xl font-semibold tracking-tight">
-                  No scheduled outages
-                </p>
-                <p className="mx-auto mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                  {status
-                    ? "Nothing matches this status. Try another one."
-                    : "There are no planned outages right now."}
-                </p>
-              </div>
-              {status && (
+            <StateCard
+              icon={TriangleAlert}
+              title="Could not load schedules"
+              text="Something went wrong while loading. Please try again."
+              action={
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => changeStatus("")}
+                  onClick={() => refetch()}
                   className="h-11 rounded-full bg-background px-6 transition-colors hover:bg-primary/15 motion-reduce:transition-none"
                 >
-                  Show all
+                  Try again
                 </Button>
-              )}
-            </div>
+              }
+            />
+          ) : outages.length === 0 ? (
+            <StateCard
+              icon={CalendarClock}
+              title="No scheduled outages"
+              text={
+                status
+                  ? "Nothing matches this status. Try another one."
+                  : "There are no planned outages right now."
+              }
+              action={
+                status ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => changeStatus("")}
+                    className="h-11 rounded-full bg-background px-6 transition-colors hover:bg-primary/15 motion-reduce:transition-none"
+                  >
+                    Show all
+                  </Button>
+                ) : undefined
+              }
+            />
           ) : (
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col">
               {groups.map(([key, items]) => {
                 const day = new Date(items[0].startTime);
                 return (
-                  <div key={key} className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
+                  <div
+                    key={key}
+                    className="flex flex-col gap-4 pb-8 last:pb-0 sm:ml-3 sm:border-l sm:border-dashed sm:pl-8"
+                  >
+                    <div className="relative flex items-center gap-3">
+                      {/* timeline dot, sits on the dashed line from sm up */}
+                      <span
+                        aria-hidden="true"
+                        className="absolute top-1/2 left-[-38.5px] hidden size-3 -translate-y-1/2 rounded-full bg-primary ring-4 ring-primary/20 sm:block"
+                      />
                       <h2 className="inline-flex items-center gap-2 rounded-full border bg-card/60 px-3.5 py-1.5 text-sm font-semibold shadow-sm backdrop-blur-sm">
                         <CalendarClock
                           aria-hidden="true"
@@ -252,8 +256,11 @@ export default function SchedulesPage() {
                       </span>
                       <span
                         aria-hidden="true"
-                        className="h-px flex-1 bg-border"
+                        className="h-px flex-1 bg-border sm:hidden"
                       />
+                      <span className="ml-auto rounded-full border bg-background px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                        {items.length} {items.length === 1 ? "outage" : "outages"}
+                      </span>
                     </div>
 
                     <ul className="flex flex-col gap-4">
@@ -322,16 +329,63 @@ export default function SchedulesPage() {
               </ul>
             </div>
 
-            <Link
-              href="/#plans"
-              className="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:outline-none motion-safe:transition-all motion-reduce:transition-none md:w-auto"
-            >
-              See premium plans
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
+            <div className="flex w-full flex-col gap-3 md:w-auto md:shrink-0">
+              <Link
+                href="/#plans"
+                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:outline-none motion-safe:transition-all motion-reduce:transition-none"
+              >
+                See premium plans
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/outages"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-12 w-full gap-2 rounded-full bg-background px-7 text-base transition-colors hover:bg-primary/15 motion-reduce:transition-none",
+                )}
+              >
+                <Activity className="size-4" aria-hidden="true" />
+                Live outages
+              </Link>
+            </div>
           </aside>
         </div>
       </section>
+    </div>
+  );
+}
+
+function StateCard({
+  icon: Icon,
+  title,
+  text,
+  action,
+}: {
+  icon: typeof CalendarClock;
+  title: string;
+  text: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed bg-card/60 px-4 py-14 text-center backdrop-blur sm:py-16">
+      <span
+        aria-hidden="true"
+        className={cn(
+          "flex size-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10",
+          amberText,
+        )}
+      >
+        <Icon className="size-6" />
+      </span>
+      <div>
+        <p className="font-serif text-2xl font-semibold tracking-tight">
+          {title}
+        </p>
+        <p className="mx-auto mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+          {text}
+        </p>
+      </div>
+      {action}
     </div>
   );
 }
@@ -347,6 +401,14 @@ function timing(outage: IPublicScheduledOutage) {
   return null;
 }
 
+// How far through an ongoing outage we are, from the real times
+function elapsedPercent(start: Date, end: Date) {
+  const total = end.getTime() - start.getTime();
+  if (total <= 0) return 100;
+  const done = ((Date.now() - start.getTime()) / total) * 100;
+  return Math.min(100, Math.max(0, Math.round(done)));
+}
+
 function OutageCard({ outage }: { outage: IPublicScheduledOutage }) {
   const start = new Date(outage.startTime);
   const end = new Date(outage.endTime);
@@ -355,6 +417,7 @@ function OutageCard({ outage }: { outage: IPublicScheduledOutage }) {
   const isInactive =
     outage.status === "COMPLETED" || outage.status === "CANCELLED";
   const endsLater = format(start, "dd MMM yyyy") !== format(end, "dd MMM yyyy");
+  const percent = isOngoing ? elapsedPercent(start, end) : 0;
 
   return (
     <li
@@ -408,42 +471,66 @@ function OutageCard({ outage }: { outage: IPublicScheduledOutage }) {
           </p>
         </div>
 
-        {/* Time window, duration and end date */}
-        <dl className="flex flex-wrap gap-x-8 gap-y-3 rounded-2xl border bg-background/70 px-4 py-3">
-          <div className="flex flex-col gap-0.5">
-            <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-              Time window
-            </dt>
-            <dd className="text-sm font-semibold">
-              <time dateTime={outage.startTime}>
-                {format(start, "hh:mm a")}
-              </time>
-              {" – "}
-              <time dateTime={outage.endTime}>{format(end, "hh:mm a")}</time>
-            </dd>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-              Duration
-            </dt>
-            <dd className="text-sm font-semibold">
-              {formatSpan(outage.startTime, outage.endTime)}
-            </dd>
-          </div>
-          {endsLater && (
+        {/* Time window, duration, end date and progress */}
+        <div className="flex flex-col gap-3 rounded-2xl border bg-background/70 px-4 py-3">
+          <dl className="flex flex-wrap gap-x-8 gap-y-3">
             <div className="flex flex-col gap-0.5">
-              <dt className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-                Ends
-              </dt>
-              <dd className="text-sm font-semibold">{format(end, "dd MMM")}</dd>
+              <dt className={labelClass}>Time window</dt>
+              <dd className="text-sm font-semibold">
+                <time dateTime={outage.startTime}>
+                  {format(start, "hh:mm a")}
+                </time>
+                {" – "}
+                <time dateTime={outage.endTime}>{format(end, "hh:mm a")}</time>
+              </dd>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <dt className={labelClass}>Duration</dt>
+              <dd className="text-sm font-semibold">
+                {formatSpan(outage.startTime, outage.endTime)}
+              </dd>
+            </div>
+            {endsLater && (
+              <div className="flex flex-col gap-0.5">
+                <dt className={labelClass}>Ends</dt>
+                <dd className="text-sm font-semibold">
+                  {format(end, "dd MMM")}
+                </dd>
+              </div>
+            )}
+          </dl>
+
+          {isOngoing && (
+            <div className="flex flex-col gap-1.5 border-t pt-3">
+              <div
+                role="progressbar"
+                aria-label="Outage progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+                className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+              >
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <p className="text-xs font-medium text-muted-foreground">
+                {percent}% of the planned window has passed
+              </p>
             </div>
           )}
-        </dl>
+        </div>
       </div>
 
       <div className="flex shrink-0 flex-row items-center justify-between gap-2 sm:flex-col sm:items-end">
         <OutageStatusChip status={outage.status} />
-        {when && <span className="text-xs text-muted-foreground">{when}</span>}
+        {when && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            <Clock aria-hidden="true" className="size-3" />
+            {when}
+          </span>
+        )}
       </div>
     </li>
   );

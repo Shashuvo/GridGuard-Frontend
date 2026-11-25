@@ -9,7 +9,9 @@ import {
   Clock,
   MapPin,
   TriangleAlert,
+  X,
   Zap,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -51,9 +53,24 @@ interface IArea {
 
 type Tab = "unexpected" | "scheduled";
 
-const tabs: { value: Tab; label: string; icon: typeof TriangleAlert }[] = [
-  { value: "unexpected", label: "Unexpected", icon: TriangleAlert },
-  { value: "scheduled", label: "Scheduled", icon: CalendarClock },
+const tabs: {
+  value: Tab;
+  label: string;
+  hint: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    value: "unexpected",
+    label: "Unexpected",
+    hint: "Reported by residents",
+    icon: TriangleAlert,
+  },
+  {
+    value: "scheduled",
+    label: "Scheduled",
+    hint: "Planned maintenance",
+    icon: CalendarClock,
+  },
 ];
 
 // Same four steps as the live outage card
@@ -173,102 +190,132 @@ export default function OutagesPage() {
           </div>
 
           {/* Area picker */}
-          <div className="flex flex-col gap-4 rounded-3xl border bg-card/80 p-5 shadow-xl shadow-black/5 backdrop-blur sm:p-6">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4 rounded-3xl border bg-card/80 p-5 shadow-xl shadow-black/5 backdrop-blur sm:p-8">
+            <div className="flex items-center justify-between gap-3">
               <label htmlFor="area-select" className={labelClass}>
                 Your area
               </label>
-              <div className="relative">
-                <MapPin
-                  aria-hidden="true"
-                  className={cn(
-                    "pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2",
-                    amberText,
-                  )}
-                />
-                <select
-                  id="area-select"
-                  value={areaId}
-                  disabled={areasLoading}
-                  onChange={(e) => changeArea(e.target.value)}
-                  className="h-12 w-full appearance-none rounded-full border bg-background pr-11 pl-11 text-base focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:outline-none disabled:opacity-60"
+              {areaId && (
+                <button
+                  type="button"
+                  onClick={() => changeArea("")}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full border bg-background px-4 text-sm font-medium transition-colors hover:bg-primary/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none"
                 >
-                  <option value="">
-                    {areasLoading ? "Loading areas…" : "All areas"}
-                  </option>
-                  {districts.map(([district, items]) => (
-                    <optgroup key={district} label={district}>
-                      {items.map((area) => (
-                        <option key={area.id} value={area.id}>
-                          {area.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-                <ChevronDown
-                  aria-hidden="true"
-                  className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground"
-                />
-              </div>
+                  <X aria-hidden="true" className="size-3.5" />
+                  Clear area
+                </button>
+              )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+            <div className="relative">
+              <MapPin
+                aria-hidden="true"
+                className={cn(
+                  "pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2",
+                  amberText,
+                )}
+              />
+              <select
+                id="area-select"
+                value={areaId}
+                disabled={areasLoading}
+                onChange={(e) => changeArea(e.target.value)}
+                className="h-12 w-full appearance-none rounded-full border bg-background pr-11 pl-11 text-base focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:outline-none disabled:opacity-60"
+              >
+                <option value="">
+                  {areasLoading ? "Loading areas…" : "All areas"}
+                </option>
+                {districts.map(([district, items]) => (
+                  <optgroup key={district} label={district}>
+                    {items.map((area) => (
+                      <option key={area.id} value={area.id}>
+                        {area.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 border-t pt-4 text-xs font-medium text-muted-foreground">
               <span className="inline-flex items-center gap-1.5 rounded-full border bg-background px-3 py-1">
                 <Zap aria-hidden="true" className={cn("size-3", amberText)} />
                 Updates automatically
               </span>
-              {areaId && unexpected.dataUpdatedAt > 0 && (
+              {selectedArea && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border bg-background px-3 py-1 text-foreground">
+                  <MapPin
+                    aria-hidden="true"
+                    className={cn("size-3", amberText)}
+                  />
+                  {selectedArea.name}, {selectedArea.district}
+                </span>
+              )}
+              {active.dataUpdatedAt > 0 && (
                 <span>
-                  Last updated{" "}
-                  {format(new Date(unexpected.dataUpdatedAt), "hh:mm:ss a")}
+                  Last updated {format(new Date(active.dataUpdatedAt), "hh:mm:ss a")}
                 </span>
               )}
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex justify-center">
-            {/* biome-ignore lint/a11y/useSemanticElements: group of toggle buttons, not a form fieldset */}
-            <div
-              role="group"
-              aria-label="Outage type"
-              className="flex max-w-full gap-1 rounded-full border bg-card/60 p-1 shadow-sm backdrop-blur-sm"
-            >
-              {tabs.map(({ value, label, icon: Icon }) => {
-                const isActive = tab === value;
-                const count = counts[value];
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => setTab(value)}
+          {/* Tabs: two selectable cards with live counts */}
+          {/* biome-ignore lint/a11y/useSemanticElements: group of toggle buttons, not a form fieldset */}
+          <div
+            role="group"
+            aria-label="Outage type"
+            className="grid grid-cols-2 gap-3 sm:gap-4"
+          >
+            {tabs.map(({ value, label, hint, icon: Icon }) => {
+              const isActive = tab === value;
+              const count = counts[value];
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setTab(value)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-3xl border p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-safe:transition-colors sm:gap-4 sm:p-5",
+                    isActive
+                      ? "border-primary bg-card shadow-xl shadow-black/5 ring-4 ring-primary/15"
+                      : "bg-card/60 hover:bg-primary/10",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
                     className={cn(
-                      "flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring motion-safe:transition-colors sm:px-5",
+                      "hidden size-12 shrink-0 items-center justify-center rounded-full sm:flex",
                       isActive
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-muted-foreground hover:bg-primary/15 hover:text-foreground",
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
+                        : cn("bg-primary/20", amberText),
                     )}
                   >
-                    <Icon aria-hidden="true" className="size-4" />
-                    {label}
-                    {count !== undefined && (
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-xs font-semibold",
-                          isActive
-                            ? "bg-primary-foreground/15"
-                            : "bg-muted text-muted-foreground",
-                        )}
-                      >
-                        {count}
-                      </span>
+                    <Icon className="size-5" />
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="font-serif text-lg font-semibold tracking-tight">
+                      {label}
+                    </span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">
+                      {hint}
+                    </span>
+                  </span>
+                  <span
+                    className={cn(
+                      "font-serif text-2xl font-bold tracking-tight sm:text-3xl",
+                      isActive ? "text-foreground" : "text-muted-foreground",
                     )}
-                  </button>
-                );
-              })}
-            </div>
+                  >
+                    {count !== undefined ? count : "–"}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Results */}
@@ -298,7 +345,7 @@ export default function OutagesPage() {
                       <Skeleton className="h-4 w-3/4 rounded-full" />
                     </div>
                   </div>
-                  <Skeleton className="h-14 w-full rounded-2xl" />
+                  <Skeleton className="h-16 w-full rounded-2xl" />
                 </div>
               ))}
             </div>
@@ -350,7 +397,7 @@ export default function OutagesPage() {
             </ul>
           )}
 
-          {areaId && activeMeta && activeMeta.totalPages > 1 && (
+          {activeMeta && activeMeta.totalPages > 1 && (
             <div className="flex flex-col items-center gap-3">
               <TablePagination
                 totalPages={activeMeta.totalPages}
@@ -368,22 +415,44 @@ export default function OutagesPage() {
             aria-label="Report an outage"
             className="flex flex-col gap-6 rounded-3xl border bg-card/80 p-5 shadow-xl shadow-black/5 backdrop-blur sm:p-8 md:flex-row md:items-center md:justify-between md:gap-8"
           >
-            <div className="flex items-center gap-4">
-              <span
-                aria-hidden="true"
-                className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30 ring-4 ring-primary/15"
-              >
-                <TriangleAlert className="size-6" />
-              </span>
-              <div className="min-w-0">
-                <h2 className="font-serif text-2xl font-semibold tracking-tight">
-                  Power out and not listed?
-                </h2>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  Report it in a few steps and let your community know.
-                </p>
+            <div className="flex flex-col gap-5">
+              <div className="flex items-center gap-4">
+                <span
+                  aria-hidden="true"
+                  className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30 ring-4 ring-primary/15"
+                >
+                  <TriangleAlert className="size-6" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-serif text-2xl font-semibold tracking-tight">
+                    Power out and not listed?
+                  </h2>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Report it in a few steps and let your community know.
+                  </p>
+                </div>
               </div>
+
+              <ul className="flex flex-wrap gap-2">
+                {["Pick your area", "Describe the problem", "Follow the repair"].map(
+                  (point) => (
+                    <li
+                      key={point}
+                      className="inline-flex items-center gap-2 rounded-full border bg-background/70 py-1 pr-3 pl-1 text-sm font-medium"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="flex size-6 items-center justify-center rounded-full bg-primary/20"
+                      >
+                        <Check className={cn("size-3.5", amberText)} />
+                      </span>
+                      {point}
+                    </li>
+                  ),
+                )}
+              </ul>
             </div>
+
             <Link
               href={user ? dashboardRoutes[user.role as UserRole] : "/register"}
               className="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:outline-none motion-safe:transition-all motion-reduce:transition-none md:w-auto"
@@ -404,7 +473,7 @@ function StateCard({
   text,
   action,
 }: {
-  icon: typeof MapPin;
+  icon: LucideIcon;
   title: string;
   text: string;
   action?: React.ReactNode;
@@ -498,7 +567,7 @@ function UnexpectedCard({
         </span>
       </div>
 
-      {/* Status track */}
+      {/* Status track: each label sits under its own segment */}
       <div className="flex flex-col gap-3 rounded-2xl border bg-background/70 p-4">
         <div
           role="progressbar"
@@ -507,39 +576,36 @@ function UnexpectedCard({
           aria-valuemax={steps.length}
           aria-valuenow={currentIndex >= 0 ? currentIndex + 1 : 0}
           aria-valuetext={label}
-          className="flex gap-1.5"
+          className="grid grid-cols-4 gap-1.5"
         >
           {steps.map((step, i) => (
-            <span
-              key={step.key}
-              className={cn(
-                "h-1.5 flex-1 rounded-full",
-                i <= currentIndex ? "bg-primary" : "bg-muted",
-              )}
-            />
-          ))}
-        </div>
-        <div className="flex items-center justify-between gap-3 text-xs">
-          <span className="hidden gap-4 text-muted-foreground sm:flex">
-            {steps.map((step, i) => (
+            <div key={step.key} className="flex flex-col gap-2">
               <span
-                key={step.key}
                 className={cn(
-                  i === currentIndex && "font-semibold text-foreground",
+                  "h-1.5 rounded-full",
+                  i <= currentIndex ? "bg-primary" : "bg-muted",
+                )}
+              />
+              <span
+                className={cn(
+                  "hidden text-[11px] sm:block",
+                  i === currentIndex
+                    ? "font-semibold text-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 {step.label}
               </span>
-            ))}
-          </span>
-          <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
-            <Clock aria-hidden="true" className="size-3.5" />
-            Reported{" "}
-            {formatDistanceToNowStrict(new Date(outage.createdAt), {
-              addSuffix: true,
-            })}
-          </span>
+            </div>
+          ))}
         </div>
+        <p className="flex items-center gap-1.5 border-t pt-3 text-xs font-medium text-muted-foreground">
+          <Clock aria-hidden="true" className="size-3.5" />
+          Reported{" "}
+          {formatDistanceToNowStrict(new Date(outage.createdAt), {
+            addSuffix: true,
+          })}
+        </p>
       </div>
     </li>
   );
@@ -580,6 +646,15 @@ function ScheduledCard({ outage }: { outage: IPublicScheduledOutage }) {
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-col gap-1.5">
+          {isOngoing && (
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/30">
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-primary-foreground"
+              />
+              Happening now
+            </span>
+          )}
           <h3 className="flex min-w-0 items-center gap-1.5 font-serif text-xl font-semibold tracking-tight">
             <MapPin
               aria-hidden="true"
