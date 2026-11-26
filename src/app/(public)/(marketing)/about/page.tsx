@@ -1,6 +1,3 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import {
   CalendarClock,
   Check,
@@ -8,6 +5,7 @@ import {
   Clock,
   House,
   LogIn,
+  type LucideIcon,
   MapPin,
   ShieldCheck,
   TriangleAlert,
@@ -15,8 +13,10 @@ import {
   UserPlus,
   Wrench,
   Zap,
-  type LucideIcon,
 } from "lucide-react";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,38 +60,42 @@ const questions = [
   { question: "When will it be fixed?", answer: "Follow the repair" },
 ];
 
+// The four statuses a real outage moves through (same as the live outage card)
+const statuses = ["Reported", "Assigned", "In progress", "Resolved"];
+
 const steps: {
   icon: LucideIcon;
   title: string;
-  status: string;
+  active: number[]; // which statuses this step covers
   description: string;
 }[] = [
   {
     icon: TriangleAlert,
     title: "Report",
-    status: "Reported",
+    active: [0],
     description: "Tell us where the power is out and what you are seeing.",
   },
   {
     icon: UserCheck,
     title: "Assign",
-    status: "In progress",
+    active: [1, 2],
     description:
       "A technician is assigned to your report and you can follow the progress.",
   },
   {
     icon: CircleCheck,
     title: "Restore",
-    status: "Resolved",
+    active: [3],
     description: "When the work is done, the outage is marked as resolved.",
   },
 ];
 
 const sampleSteps = [
-  { label: "Outage reported", done: true },
-  { label: "Technician assigned", done: true },
-  { label: "Power restored", done: false },
-];
+  { label: "Outage reported", state: "done" },
+  { label: "Technician assigned", state: "done" },
+  { label: "Repair in progress", state: "current" },
+  { label: "Power restored", state: "pending" },
+] as const;
 
 const audiences: {
   icon: LucideIcon;
@@ -215,10 +219,9 @@ export default function AboutPage() {
             </h1>
 
             <p className="max-w-2xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
-              GridGuard is a power outage and load-shedding management
-              platform. We help people see when the lights will go off, report
-              problems quickly, and follow every repair until the power is
-              back.
+              GridGuard is a power outage and load-shedding management platform.
+              We help people see when the lights will go off, report problems
+              quickly, and follow every repair until the power is back.
             </p>
 
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -260,39 +263,51 @@ export default function AboutPage() {
                 role="progressbar"
                 aria-label="Sample repair progress"
                 aria-valuemin={0}
-                aria-valuemax={3}
-                aria-valuenow={2}
+                aria-valuemax={4}
+                aria-valuenow={3}
                 className="h-2 w-full overflow-hidden rounded-full bg-muted"
               >
-                <div className="h-full w-2/3 rounded-full bg-primary" />
+                <div className="h-full w-3/4 rounded-full bg-primary" />
               </div>
               <p className="text-xs font-medium text-muted-foreground">
-                2 of 3 steps done
+                Step 3 of 4: repair in progress
               </p>
             </div>
 
             <ul className="mt-4 flex flex-col gap-2.5">
-              {sampleSteps.map(({ label, done }) => (
+              {sampleSteps.map(({ label, state }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-3 rounded-2xl border bg-background/70 px-3.5 py-3 text-sm font-medium"
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-sm font-medium",
+                    state === "current"
+                      ? "border-primary/40 bg-background shadow-sm"
+                      : "bg-background/70",
+                  )}
                 >
                   <span
                     aria-hidden
                     className={cn(
                       "flex size-7 shrink-0 items-center justify-center rounded-full",
-                      done
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-dashed text-muted-foreground",
+                      state === "done" && "bg-primary text-primary-foreground",
+                      state === "current" && cn("bg-primary/20", amberText),
+                      state === "pending" &&
+                        "border border-dashed text-muted-foreground",
                     )}
                   >
-                    {done ? (
+                    {state === "done" ? (
                       <Check className="size-4" />
+                    ) : state === "current" ? (
+                      <Wrench className="size-4" />
                     ) : (
                       <Clock className="size-4" />
                     )}
                   </span>
-                  <span className={cn(!done && "text-muted-foreground")}>
+                  <span
+                    className={cn(
+                      state === "pending" && "text-muted-foreground",
+                    )}
+                  >
                     {label}
                   </span>
                 </li>
@@ -429,7 +444,7 @@ export default function AboutPage() {
           />
 
           <ol className="mx-auto flex w-full max-w-3xl flex-col">
-            {steps.map(({ icon: Icon, title, description }, i) => (
+            {steps.map(({ icon: Icon, title, description, active }, i) => (
               <li key={title} className="flex gap-4 sm:gap-6">
                 {/* Rail */}
                 <div className="flex flex-col items-center">
@@ -477,20 +492,23 @@ export default function AboutPage() {
                     aria-label="Outage status"
                     className="flex flex-wrap gap-2 border-t pt-4"
                   >
-                    {steps.map((s, n) => (
-                      <li
-                        key={s.status}
-                        aria-current={n === i ? "step" : undefined}
-                        className={cn(
-                          "rounded-full border px-3 py-1 text-xs font-medium",
-                          n === i
-                            ? "border-transparent bg-primary text-primary-foreground shadow-sm shadow-primary/30"
-                            : "bg-background text-muted-foreground",
-                        )}
-                      >
-                        {s.status}
-                      </li>
-                    ))}
+                    {statuses.map((status, n) => {
+                      const current = active.includes(n);
+                      return (
+                        <li
+                          key={status}
+                          aria-current={current ? "step" : undefined}
+                          className={cn(
+                            "rounded-full border px-3 py-1 text-xs font-medium",
+                            current
+                              ? "border-transparent bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+                              : "bg-background text-muted-foreground",
+                          )}
+                        >
+                          {status}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </li>
@@ -565,8 +583,8 @@ export default function AboutPage() {
               Ready to stay ahead of the next power cut?
             </h2>
             <p className="text-balance leading-relaxed text-muted-foreground sm:text-lg">
-              Choose how you want to use GridGuard. It only takes a few
-              minutes to get set up.
+              Choose how you want to use GridGuard. It only takes a few minutes
+              to get set up.
             </p>
           </div>
 
