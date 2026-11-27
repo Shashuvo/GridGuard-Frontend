@@ -22,7 +22,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "About us | GridGuard",
   description:
     "GridGuard is a power outage and load-shedding management platform that helps people follow schedules, report outages and track repairs.",
 };

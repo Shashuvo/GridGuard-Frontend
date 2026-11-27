@@ -12,7 +12,6 @@ export function createMetadata({
   path?: string;
 }): Metadata {
   return {
-    title: `${title} | GridGuard`,
     description,
     openGraph: {
       title: `${title} | GridGuard`,
